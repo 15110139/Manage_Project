@@ -19,20 +19,13 @@ import {
   RESET_PASSWORD_SCHEMA
 } from "../validationSchemes/auth";
 import ValidationError from "../errors/validation";
-import { equal } from "assert";
 import UserModel from "../models/User";
-var twoFactor = require("node-2fa");
 
 class AuthController extends BaseController {
   constructor() {
     super();
     this._passport = require("passport");
   }
-  /**
-   * Function : Login new user
-   * Params: information of user
-   * Result: access-token
-   */
   login(req, res, next) {
     this.authenticateLogin(req, res, next, user => {
       authHandler.login(
@@ -42,11 +35,6 @@ class AuthController extends BaseController {
       );
     });
   }
-  /**
-   * Function : Create new user
-   * Params: information of user
-   * Result: access-token
-   */
   register(req, res) {
     return authHandler.register(
       req,
@@ -111,48 +99,7 @@ class AuthController extends BaseController {
     });
     return listuser;
   }
-  async findOneAndUpdate(_id) {
-    const user = await UserModel.findOneAndUpdate(
-      { _id, status: "ACTIVE" },
-      {
-        status: "BLOCK"
-      }
-    );
-    console.log("ok lg");
-  }
-  async dequy(listuser) {
-    if (listuser.length == 0) return;
-    for (let i = 0; i < listuser.length; i++) {
-      console.log("---------------------khoa-----------------------------");
-      await this.findOneAndUpdate(listuser[i]._id);
-      console.log("------------------------------------------------------");
 
-      console.log("user cha", listuser[i].username);
-      let listcon = await this.findUserBySoponr(listuser[i]._id);
-      console.log("----------so con cua no", listcon.length, "-----------");
-      console.log("list con", listcon, "list con");
-      await this.dequy(listcon);
-    }
-  }
-  async block(req, res, next) {
-    let email = req.body.email;
-    console.log("email", email);
-    try {
-      const user = await this.findUserByEmail(email);
-      let arruser = [];
-      arruser.push(user);
-      await this.dequy(arruser);
-      this.response(res).onSuccess("OK");
-    } catch (errors) {
-      this.response(res).onError(errors);
-    }
-  }
-
-  /**
-   * Function : Update avatar
-   * Params: avatarUrl
-   * Result: new information or error code
-   */
   async updateAvatarByUserId(req, res, next) {
     let data = req.body;
     try {
@@ -173,11 +120,6 @@ class AuthController extends BaseController {
     }
   }
 
-  /**
-   * Function : Update password
-   * Params: oldPassword, newPassword
-   * Result: SUCCESS
-   */
   async updatePasswordByUserId(req, res, next) {
     let data = req.body;
     try {
@@ -198,11 +140,6 @@ class AuthController extends BaseController {
     }
   }
 
-  /**
-   * Function : Verify email
-   * Param: access-token
-   * Output: success
-   */
   async verifyEmail(req, res, next) {
     let { email, codeVerify } = req.query;
     try {
@@ -241,45 +178,6 @@ class AuthController extends BaseController {
       if (sponsor && sponsor.isEmailVerified === true)
         await authHandler.coupon20CSE(sponsor._id);
 
-      return this.response(res).onSuccess("SUCCESS");
-    } catch (error) {
-      return this.response(res).onError(error);
-    }
-  }
-
-  /**
-   * Function : re-send Verify email
-   * Param: access-token
-   * Output: success
-   */
-  async requestReset2Fa(req, res, next) {
-    let { email } = req.body;
-    try {
-      const errors = await this.getErrorsParameters(req, EMAIL_VALIDATE_SCHEMA);
-      if (errors.length > 0) throw new ValidationError(errors);
-
-      // check 2fa is not exist
-      let isEnable2Fa = await authHandler.isHave2Fa(req.userId);
-      if (!isEnable2Fa) throw new ValidationError("YOU_HAVE_NOT_ACTIVATED_2FA");
-
-      let updateCodeVerify = await authHandler.updateCodeVerify(req.userId);
-
-      // send email verify
-      const payload = {
-        to: email,
-        from: '"CSE Token" <support@csetoken.io>',
-        subject: "CSE Confirm Reset 2FA - no reply",
-        html: contentEmail(
-          `https://dashboard.` +
-            emailConfig.domain +
-            `/confirmReset2FA?email=` +
-            email +
-            `&codeVerify=` +
-            updateCodeVerify
-        )
-      };
-      await emailHandler.sendEmail(payload);
-      console.log(updateCodeVerify);
       return this.response(res).onSuccess("SUCCESS");
     } catch (error) {
       return this.response(res).onError(error);
@@ -341,99 +239,12 @@ class AuthController extends BaseController {
     }
   }
 
-  /**
-   * Function : Generate 2FA
-   * Param: access-token
-   * Output: secretKey
-   */
-  async generate2FA(req, res, next) {
-    try {
-      let isAvailable = await authHandler.isHave2Fa(req.userId);
-      if (isAvailable) throw new ValidationError("2FA_ALREADY_EXISTS");
-      let user = await authHandler.getInformationByUserId(req.userId);
-
-      let data = await twoFactor.generateSecret({
-        name: "csetoken.co",
-        account: user.username + "@csecoin",
-        userId: req.userId
-      });
-      let created = await authHandler.createUser2Fa(
-        req.userId,
-        data.secret,
-        data.qr,
-        data.uri
-      );
-      return this.response(res).onSuccess(created);
-    } catch (error) {
-      return this.response(res).onError(error);
-    }
-  }
-
-  /**
-   * Function : remove 2FA
-   * Param: access-token
-   * Output: secretKey
-   */
   async remove2Fa(req, res, next) {
     try {
       let isAvailable = await authHandler.isHave2Fa(req.userId);
       if (!isAvailable) throw new ValidationError("2FA_NOT_EXISTS");
       let remove = await authHandler.removeUser2Fa(req.userId);
       return this.response(res).onSuccess("SUCCESS");
-    } catch (error) {
-      return this.response(res).onError(error);
-    }
-  }
-
-  /**
-   * Function : verify 2FA
-   * Param: access-token, tokenCode
-   * Output: success: true
-   */
-  async verify2Fa(req, res, next) {
-    try {
-      let secretKey = await authHandler.getSecret2FaByUserId(req.userId);
-      let isSuccess = await twoFactor.verifyToken(secretKey, tokenCode);
-      return this.response(res).onSuccess(isSuccess);
-    } catch (error) {
-      return this.response(res).onError(error);
-    }
-  }
-
-  /**
-   * Function : check available 2fa
-   * Param: access-token, tokenCode
-   * Output: success: true
-   */
-  async isEnable2Fa(req, res, next) {
-    try {
-      let isEnable2Fa = await authHandler.isHave2Fa(req.userId);
-      return this.response(res).onSuccess({ isEnable2Fa });
-    } catch (error) {
-      return this.response(res).onError(error);
-    }
-  }
-
-  /**
-   * Function : confirm create 2FA
-   * Param: access-token, tokenCode
-   * Output: success: true
-   */
-  async confirm2Fa(req, res, next) {
-    try {
-      let code2FA = req.body.code2FA || req.query.code2FA || req.params.code2FA;
-      if (!code2FA) throw new ValidationError("AUTHENTICATION_2FA_FAILURE");
-
-      let secretKey = await authHandler.getSecret2FaNotYetConfirmByUserId(
-        req.userId
-      );
-      if (!secretKey) throw new ValidationError("2FA_NOT_EXISTS");
-
-      let isSuccess = await twoFactor.verifyToken(secretKey, code2FA);
-      if (!isSuccess) throw new ValidationError("AUTHENTICATION_2FA_FAILURE");
-
-      let update = await authHandler.updateConfirm2Fa(req.userId);
-      return this.response(res).onSuccess();
     } catch (error) {
       return this.response(res).onError(error);
     }
@@ -466,40 +277,6 @@ class AuthController extends BaseController {
       return this.response(res).onSuccess("SUCCESS");
     } catch (error) {
       console.log(error);
-      return this.response(res).onError(error);
-    }
-  }
-
-  async confirmReset2Fa(req, res, next) {
-    console.log("confirmReset2Fa");
-    let { codeVerify, email } = req.query;
-    console.log("req.query", req.query);
-    try {
-      const errors = await this.getErrorsParameters(
-        req,
-        null,
-        VERIFY_EMAIL_SCHEMA
-      );
-      if (errors.length > 0) throw new ValidationError(errors);
-
-      //Get user
-      let user = await authHandler.getInformationByEmail(email);
-      if (!user) throw new ValidationError("EMAIL_NOT_EXIST");
-
-      //Get 2fa record
-      let isEnable2Fa = await authHandler.isHave2Fa(user._id);
-      console.log("isEnable2Fa", isEnable2Fa, user._id);
-      if (!isEnable2Fa) throw new ValidationError("YOU_HAVE_NOT_ACTIVATED_2FA");
-
-      //Validate code verify
-      if (isEnable2Fa.codeVerify != codeVerify)
-        throw new ValidationError("CODE_VERIFY_INVALID");
-
-      //Delete record
-      await authHandler.removeUser2Fa(user._id);
-
-      return this.response(res).onSuccess("SUCCESS");
-    } catch (error) {
       return this.response(res).onError(error);
     }
   }

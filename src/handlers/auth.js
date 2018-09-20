@@ -1,6 +1,5 @@
 import ValidationError from "../errors/validation";
 import validator from "validator";
-import requestIp from "request-ip";
 import emailConfig from "../../config/email";
 import contentEmail from "../../config/contentVerifyEmail";
 import Base from "./base";
