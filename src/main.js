@@ -10,8 +10,7 @@ const runApp = async () => {
     let server = null;
     await InitMongo();
     const app = InitExpress();
-    if (NODE_ENV === "dev") server = http.createServer(app);
-    else server = https.createServer(app);
+    server = http.createServer(app);
     const { PORT } = config.server;
     server.listen(PORT, () => console.log(`Listening on port ${PORT}`));
   } catch (err) {
