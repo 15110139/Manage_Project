@@ -1,26 +1,25 @@
 import mongoose from "mongoose";
 require("mongoose-uuid2")(mongoose);
-var UUID = mongoose.Types.UUID;
 const uuid = require("node-uuid");
 
 const TaskSchema = new mongoose.Schema(
   {
-    _id: { type: UUID, default: uuid.v4 },
+    _id: { type: String, default: uuid.v4 },
+    listTaskId: { type: String, ref: "ListTask" },
+    projectId: { type: String, ref: "listTask" },
     title: {
       type: String
     },
     describe: {
       type: String
     },
-    members: [{ type: UUID, ref: "User" }],
+    members: [{ type: String, ref: "User" }],
     timeExpired: {
       type: Date
-    },
-    comments: [{ type: UUID, ref: "Comment" }],
-    actives: [{ type: UUID, ref: "Active" }]
+    }
   },
   { timestamps: true }
 );
 
-const TaskSchema = mongoose.model("Task", TaskSchema);
-export default TaskSchema;
+const TaskModel = mongoose.model("Task", TaskSchema);
+export default TaskModel;

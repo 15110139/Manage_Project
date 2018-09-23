@@ -2,11 +2,10 @@ import mongoose from "mongoose";
 import bcrypt from "bcrypt";
 const SALT_WORK_FACTOR = 10;
 require("mongoose-uuid2")(mongoose);
-var UUID = mongoose.Types.UUID;
-const uuid = require('node-uuid')
+const uuid = require("node-uuid");
 const UserSchema = new mongoose.Schema(
   {
-    _id: { type: UUID, default: uuid.v4 },
+    _id: { type: String, default: uuid.v4 },
     email: {
       type: String,
       required: true,
@@ -23,7 +22,7 @@ const UserSchema = new mongoose.Schema(
     avatarUrl: {
       type: String,
       default: ""
-    },
+    }
   },
   { timestamps: true }
 );

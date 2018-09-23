@@ -6,10 +6,11 @@ let authHandler = new AuthHandler();
 let emailHandler = new EmailHandler();
 import emailConfig from "../../config/email";
 import contentEmail from "../../config/contentVerifyEmail";
+const config = require("../middlewares/config");
 
 import moment from "moment";
 import sha256 from "sha256";
-
+const jwt = require("jsonwebtoken");
 //Import validate input scheme
 import {
   UPDATE_AVATAR_VALIDATE_SCHEMA,
@@ -24,58 +25,56 @@ import UserModel from "../models/User";
 class AuthController extends BaseController {
   constructor() {
     super();
-    this._passport = require("passport");
   }
-  login(req, res, next) {
-    this.authenticateLogin(req, res, next, user => {
-      authHandler.login(
+  async register(req, res) {
+    const data = req.body;
+    try {
+      //Validate input
+      /*   let errors = await this.getErrorsParameters(
         req,
-        user,
-        this._responseHelper.getDefaultResponseHandler(res)
+        REGISTER_VALIDATION_SCHEMA
       );
-    });
-  }
-  register(req, res) {
-    return authHandler.register(
-      req,
-      this._responseHelper.getDefaultResponseHandler(res)
-    );
-  }
+      if (errors.length > 0) throw new ValidationError(errors); */
 
-  authenticate(req, res, next, callback) {
-    let responseManager = this._responseHelper;
-    this._passport.authenticate("jwt-auth", {
-      onVerified: callback,
-      onFailure: function(error) {
-        responseManager.respondWithError(
-          res,
-          error.status || 401,
-          error.message
-        );
+      //Handling
+      // let username = changeToSlug(data.username);
+      const email = data.email;
+      const password = data.password;
+
+      let isExistEmail = await UserModel.findOne({ email });
+      if (isExistEmail) {
+        throw new ValidationError("EMAIL_IS_EXIST");
       }
-    })(req, res, next);
+      const newUser = await authHandler.createNewUser(email, password);
+      this.response(res).onSuccess(newUser);
+    } catch (errors) {
+      this.response(res).onError(errors);
+    }
   }
-
-  authenticateLogin(req, res, next, callback) {
-    let responseManager = this._responseHelper;
-    this._passport.authenticate("credentials-auth", function(err, user) {
-      if (err) {
-        responseManager.respondWithError(
-          res,
-          err.status || 401,
-          err.message || ""
-        );
-      } else {
-        callback(user);
+  async login(req, res) {
+    const data = req.body;
+    try {
+      /*   let errors = await this.getErrorsParameters(req, LOGIN_VALIDATION_SCHEMA);
+      if (errors.length > 0) throw new ValidationError(errors); */
+      // if (!user.isEmailVerified)
+      //   throw new ValidationError("EMAIL_NOT_VERIFIED");
+      const user = await authHandler.loginAccount(data.email, data.password);
+      if (!user) {
+        throw new ValidationError("EMAIL_OR_PASSWORD_INCORRECT");
       }
-    })(req, res, next);
+      const token = jwt.sign(
+        {
+          userId: user.id
+        },
+        config.secret
+      );
+      if (!token) throw new ValidationError("EMAIL_OR_PASSWORD_NOTFOUND");
+      this.response(res).onSuccess({ token });
+    } catch (errors) {
+      this.response(res).onError(errors);
+    }
   }
 
-  /**
-   * Function : Update information of user
-   * Params: fields update
-   * Result: new information or error code
-   */
   async updateInformationByUserId(req, res, next) {
     let data = req.body;
     try {
@@ -251,7 +250,6 @@ class AuthController extends BaseController {
   }
 
   async resetPassword(req, res, next) {
-    console.log("resetPassword");
     try {
       const { email } = req.body;
       const errors = await this.getErrorsParameters(

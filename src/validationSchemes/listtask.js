@@ -1,19 +1,11 @@
-export const PROJECT_SHEME = {
+export const LIST_TASK_SHEME = {
   name: {
     notEmpty: {
       errorMessage: "PROJECT_NAME_IS_EMPTY"
     },
     isLength: {
       options: [{ min: 2, max: 50 }],
-      errorMessage: "INVAILD_PROJECT_NAME"
-    }
-  }
-};
-
-export const ADD_MEMBERS_TO_PROJECT = {
-  userId: {
-    notEmpty: {
-      errorMessage: "USER_ID_IS_EMPTY"
+      errorMessage: "INVAILD_LIST_TASK_NAME"
     }
   },
   projectId: {

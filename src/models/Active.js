@@ -1,12 +1,12 @@
 import mongoose from "mongoose";
 require("mongoose-uuid2")(mongoose);
-var UUID = mongoose.Types.UUID;
 const uuid = require("node-uuid");
 const ActiveSchema = new mongoose.Schema(
   {
-    _id: { type: UUID, default: uuid.v4 },
-    user: {
-      type: UUID,
+    _id: { type: String, default: uuid.v4 },
+    idTask: { type: String, ref: "Task" },
+    userId: {
+      type: String,
       ref: "User"
     },
     content: {
@@ -16,5 +16,5 @@ const ActiveSchema = new mongoose.Schema(
   { timestamps: true }
 );
 
-const ActiveSchema = mongoose.model("Active", ActiveSchema);
-export default ActiveSchema;
+const ActiveModel = mongoose.model("Active", ActiveSchema);
+export default ActiveModel;

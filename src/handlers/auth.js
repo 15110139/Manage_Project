@@ -1,139 +1,27 @@
 import ValidationError from "../errors/validation";
-import validator from "validator";
-import emailConfig from "../../config/email";
-import contentEmail from "../../config/contentVerifyEmail";
 import Base from "./base";
-const uuidv4 = require("uuid/v4");
+var bcrypt = require("bcrypt");
 //Import models
 import UserModel from "../models/User";
-import {
-  LOGIN_VALIDATION_SCHEMA,
-} from "../validationSchemes/auth";
-
-import AuthHelp from "../helpers/authencation";
-import EmailHandler from "./email";
 
 // import RevenueModel from "../models/Revenue";
 
-const emailHandler = new EmailHandler();
-
 class AuthHandler extends Base {
-  async login(req, user, callback) {
-    const data = req.body;
-    try {
-      let errors = await this.getErrorsParameters(req, LOGIN_VALIDATION_SCHEMA);
-      if (errors.length > 0) throw new ValidationError(errors);
-      // if (!user.isEmailVerified)
-      //   throw new ValidationError("EMAIL_NOT_VERIFIED");
-
-      if (user.status === "BLOCK")
-        throw new ValidationError("YOUR_ACCOUNT_IS_BLOCKED");
-      let token = await this.getToken(user);
-      if (!token) throw new ValidationError("EMAIL_OR_PASSWORD_NOTFOUND");
-
-      //update lastLoginIP
-
-      return callback.onSuccess({ token });
-    } catch (errors) {
-      console.log(errors);
-      return callback.onError(errors);
-    }
+  async loginAccount(email, password) {
+    const user = await UserModel.findOne({ email });
+    const match = await bcrypt.compare(password, user.password);
+    if (match) {
+      return user;
+    } else return false;
   }
-
-  getToken(user) {
-    return AuthHelp.signToken(
-      "jwt-auth",
-      this._provideTokenPayload(user),
-      this._provideTokenOptions()
-    );
-  }
-
-  getSponsorId(username) {
-    return new Promise((resolve, reject) => {
-      if (!username) return reject(new ValidationError("NOT_FOUND_SPONSOR"));
-      return UserModel.findOne({ username, status: { $ne: "BLOCK" } }).then(
-        result => {
-          if (!result) reject(new ValidationError("NOT_FOUND_SPONSOR"));
-          else resolve(result._id);
-        }
-      );
+  async createNewUser(email, password) {
+    const newUser = await UserModel.create({
+      email,
+      password,
+      projects: []
     });
+    return newUser;
   }
-
-  async register(req, callback) {
-    const data = req.body;
-    try {
-      //Validate input
-      /*   let errors = await this.getErrorsParameters(
-        req,
-        REGISTER_VALIDATION_SCHEMA
-      );
-      if (errors.length > 0) throw new ValidationError(errors); */
-
-      //Handling
-      // let username = changeToSlug(data.username);
-      let email = data.email.toLowerCase();
-      console.log(uuidv4());
-      let isExistEmail = await UserModel.findOne({ email });
-      if (isExistEmail) {
-        throw new ValidationError("EMAIL_IS_EXIST");
-      }
-      // let isExistUsername = await UserModel.findOne({ username });
-      let created = await UserModel.create({
-        email,
-        password: validator.trim(data.password),
-        projects: []
-      });
-
-      // send email verify
-      const payload = {
-        to: created.email,
-        from: '"CSE Token" <support@csetoken.io>',
-        subject: "CSE Email Verification - no reply",
-        html: contentEmail(
-          `https://dashboard.` +
-            emailConfig.domain +
-            `/verifyEmail?email=` +
-            created.email +
-            `&codeVerify=` +
-            created.codeVerify
-        )
-        // "<a href='http://" +
-        // emailConfig.domain +
-        // "/?email=" +
-        // created.email +
-        // "&codeVerify=" +
-        // created.codeVerify +
-        // "'>Click me</a> to verify your email."
-      };
-
-      // await emailHandler.sendEmail(payload);
-      let token = await this.getToken(created);
-      if (!token) throw new ValidationError("EMAIL_OR_PASSWORD_NOTFOUND");
-      return callback.onSuccess({ token });
-    } catch (errors) {
-      console.log(errors);
-      return callback.onError(errors);
-    }
-  }
-
-  _provideTokenPayload(user) {
-    return {
-      _id: user._id,
-      username: user.username
-    };
-  }
-
-  _provideTokenOptions() {
-    let config = global.config;
-    return {
-      expiresIn: "2 days",
-      audience: config.jwtOptions.audience,
-      issuer: config.jwtOptions.issuer,
-      algorithm: config.jwtOptions.algorithm
-    };
-  }
-
   async checkFieldsCanUpdate(fields = {}) {
     let canUpdates = {
       fullName: 1,
@@ -175,8 +63,8 @@ class AuthHandler extends Base {
     return url;
   }
 
-  async getInformationByUserId(userId) {
-    let user = await UserModel.findById(userId);
+  async getUserById(userId) {
+    let user = await UserModel.findOne({ _id: userId });
     if (user) {
       user = user.toObject();
       delete user.password;
@@ -233,9 +121,7 @@ class AuthHandler extends Base {
   }
   async updatePassworByEmail(email, password) {
     const user = await UserModel.findOne({ email });
-    console.log("user", user.password);
     user.password = password;
-    console.log("user", user.password);
     return user.save();
   }
 

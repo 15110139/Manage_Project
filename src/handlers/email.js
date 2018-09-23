@@ -52,7 +52,6 @@ class EmailHandler extends Base {
       }
     });
     return await transporter.sendMail(data, (error, info) => {
-      console.log("ddddddddddddddddddddddddddddddddd", error, info);
     });
   }
 

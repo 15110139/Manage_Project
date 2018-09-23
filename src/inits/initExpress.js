@@ -4,7 +4,6 @@ import bodyParser from "body-parser";
 import cors from "cors";
 
 import ValidationHelp from "../helpers/validation";
-import AuthencationHelp from "../helpers/authencation";
 
 import ResponseHelper from "../helpers/response";
 // routers
@@ -24,8 +23,6 @@ export default () => {
     "/static",
     express.static(path.join(__dirname, "../uploads/avatars"))
   );
-  // register passport
-  app.use(AuthencationHelp.providePassport().initialize());
 
   // register validation helper
   app.use(Validation.provideDefaultValidator());
