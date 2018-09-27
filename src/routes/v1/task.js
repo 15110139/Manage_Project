@@ -22,5 +22,8 @@ router.put(
 
 router.put("/removeMembersToTask",authentication,taskController.removeMembersToTask)
 
+router.put("/moveTask",authentication,taskController.moveTask)
+
+
 
 export default router;

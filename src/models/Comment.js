@@ -5,7 +5,7 @@ const uuid = require("node-uuid");
 const CommentSchema = new mongoose.Schema(
   {
     id: { type: String, default: uuid.v4 },
-    idTask: { type: String, ref: "Task" },
+    taskId: { type: String, ref: "Task" },
     userId: {
       type: String,
       ref: "User"
@@ -13,6 +13,7 @@ const CommentSchema = new mongoose.Schema(
     content: {
       type: String
     },
+    tag: [{ type: String, ref: "User" }],
     data: {
       type: String
     }

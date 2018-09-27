@@ -5,8 +5,8 @@ const uuid = require("node-uuid");
 const TaskSchema = new mongoose.Schema(
   {
     _id: { type: String, default: uuid.v4 },
-    listTaskId: { type: String, ref: "ListTask" },
-    projectId: { type: String, ref: "listTask" },
+    listId: { type: String, ref: "List" },
+    projectId: { type: String, ref: "Project" },
     title: {
       type: String
     },

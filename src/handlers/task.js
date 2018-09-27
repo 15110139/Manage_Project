@@ -3,11 +3,11 @@ import Base from "./base";
 import TaskModel from "../models/Task";
 
 class TaskHandler extends Base {
-  async createNewTask(listTaskId, projectId, title) {
+  async createNewTask(listId, projectId, title) {
     const newTask = await TaskModel.create({
       title,
       projectId,
-      listTaskId,
+      listId,
       members: [],
       describe: ""
     });
@@ -27,12 +27,15 @@ class TaskHandler extends Base {
   }
 
   async removeMembersToTask(taskId, userId) {
-    console.log("position", userId, taskId);
     const result = await TaskModel.updateOne(
       { _id: taskId },
       { $pull: { members: userId } }
     );
     return result;
+  }
+  async moveTask(taskId, listId) {
+    const newTask = TaskModel.updateOne({ _id: taskId }, { listId: listId });
+    return newTask;
   }
 }
 export default TaskHandler;

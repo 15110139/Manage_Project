@@ -7,9 +7,9 @@ export const TASK_SHEME = {
       errorMessage: "INVAILD_TASK_TITLE"
     }
   },
-  listTaskId: {
+  listId: {
     notEmpty: {
-      errorMessage: "LIST_TASK_ID_IS_EMPTY"
+      errorMessage: "LIST_ID_IS_EMPTY"
     }
   },
   projectId: {
@@ -23,6 +23,17 @@ export const ADD_MEMBERS_TO_TASK_SHEME = {
   userId: {
     notEmpty: true,
     errorMessage: "USER_ID_IS_EMPTY"
+  },
+  taskId: {
+    notEmpty: true,
+    errorMessage: "TASK_ID_IS_EMPTY"
+  }
+};
+
+export const SWITCH_TASK_BETWEEN_TWO_LIST = {
+  listId: {
+    notEmpty: true,
+    errorMessage: "LIST_ID_IS_EMPTY"
   },
   taskId: {
     notEmpty: true,
