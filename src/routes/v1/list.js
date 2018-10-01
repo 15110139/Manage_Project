@@ -11,5 +11,7 @@ let listController = new ListController();
 router.post("/createNewList", authentication, listController.createNewList);
 router.put("/updateList", authentication, listController.updateList);
 router.delete("/removeList", authentication, listController.removeList);
+router.post("/getListByProjectId", authentication, listController.getListsByProjectId);
+
 
 export default router;

@@ -30,7 +30,10 @@ class ProjectController extends BaseController {
   async addMembersToProject(req, res) {
     const { userId, projectId } = req.body;
     try {
-      const errors = await this.getErrorsParameters(req, ADD_MEMBERS_TO_PROJECT);
+      const errors = await this.getErrorsParameters(
+        req,
+        ADD_MEMBERS_TO_PROJECT
+      );
       if (errors.length > 0) throw new ValidationError(errors);
       const user = await authHandler.getUserById(userId);
       if (!user) throw new ValidationError("USER_NOT_FOUND");
@@ -66,6 +69,21 @@ class ProjectController extends BaseController {
         userId
       );
       this.response(res).onSuccess(newProject);
+    } catch (errors) {
+      this.response(res).onError(errors);
+    }
+  }
+  async getListProjectByUser(req, res) {
+    try {
+      const { userId } = req;
+      const projectsCreateByUser = await projectHandler.getListProjectCreateByUser(
+        userId
+      );
+      const projectsIsMembers = await projectHandler.getListProjectIsMembers(
+        userId
+      );
+      const projects = projectsCreateByUser.concat(projectsIsMembers);
+      this.response(res).onSuccess(projects);
     } catch (errors) {
       this.response(res).onError(errors);
     }

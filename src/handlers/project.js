@@ -33,6 +33,15 @@ class ProjectHandler extends Base {
     return result;
   }
 
+  async getListProjectCreateByUser(userId) {
+    const projects = await ProjectModel.find({ userId });
+    return projects;
+  }
+  async getListProjectIsMembers(userId) {
+    const projects = await ProjectModel.find({ "members": userId });
+    return projects
+  }
+
   //
 }
 export default ProjectHandler;

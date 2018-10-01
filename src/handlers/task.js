@@ -34,8 +34,16 @@ class TaskHandler extends Base {
     return result;
   }
   async moveTask(taskId, listId) {
-    const newTask = TaskModel.updateOne({ _id: taskId }, { listId: listId });
+    const newTask = await TaskModel.updateOne(
+      { _id: taskId },
+      { listId: listId }
+    );
     return newTask;
+  }
+
+  async getTasksByListId(listId) {
+    const tasks = await TaskModel.find({ listId });
+    return tasks;
   }
 }
 export default TaskHandler;

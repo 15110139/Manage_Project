@@ -24,6 +24,8 @@ router.put("/removeMembersToTask",authentication,taskController.removeMembersToT
 
 router.put("/moveTask",authentication,taskController.moveTask)
 
+router.post("/getTasksByListId",authentication,taskController.getTasksByListId)
+
 
 
 export default router;
