@@ -17,6 +17,7 @@ const authenticate = (req, res, next) => {
         );
       }
       req.userId = decoded.userId;
+      req.fullName = decoded.fullName;
       next();
     });
   } else {

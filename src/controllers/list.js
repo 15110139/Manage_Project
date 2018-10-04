@@ -5,7 +5,9 @@ import ValidationError from "../errors/validation";
 
 import ListHandlers from "../handlers/list";
 import ProjectHandler from "../handlers/project";
+import ActivetHandler from "../handlers/active";
 
+const activetHandler = new ActivetHandler();
 const projectHandler = new ProjectHandler();
 const listHandlers = new ListHandlers();
 
@@ -24,6 +26,15 @@ class ListController extends BaseController {
           throw new ValidationError("USER_IS_NOT_IN_PROJECT");
       }
       const newList = await listHandlers.createNewList(projectId, name);
+      await activetHandler.createNewActive(
+        "CREATE_NEW_LIST",
+        projectId,
+        null,
+        userId,
+        newList._id,
+        null,
+        null
+      );
       this.response(res).onSuccess(newList);
     } catch (errors) {
       this.response(res).onError(errors);

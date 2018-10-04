@@ -13,6 +13,7 @@ const TaskSchema = new mongoose.Schema(
     describe: {
       type: String
     },
+    lable: [String],
     members: [{ type: String, ref: "User" }],
     timeExpired: {
       type: Date

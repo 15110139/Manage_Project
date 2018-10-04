@@ -4,14 +4,16 @@ const uuid = require("node-uuid");
 const ActiveSchema = new mongoose.Schema(
   {
     _id: { type: String, default: uuid.v4 },
+    projectId: { type: String, ref: "Project" },
+    type: { String },
     idTask: { type: String, ref: "Task" },
-    userId: {
+    listId: { type: String, ref: "List" },
+    activeByUserId: {
       type: String,
       ref: "User"
     },
-    content: {
-      type: String
-    }
+    userId: { type: String, ref: "User" },
+    listIdToMove: { type: String, ref: "List" }
   },
   { timestamps: true }
 );

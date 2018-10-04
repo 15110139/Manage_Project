@@ -10,7 +10,10 @@ import ValidationError from "../errors/validation";
 import TaskHandlers from "../handlers/task";
 import ProjectHandler from "../handlers/project";
 import ListHandler from "../handlers/list";
-
+import NotifycationHandler from "../handlers/notifycation";
+import ActiveHandler from "../handlers/active";
+const activeHandler = new ActiveHandler();
+const notifycationHandler = new NotifycationHandler();
 const taskHandlers = new TaskHandlers();
 const projectHandler = new ProjectHandler();
 const listHandler = new ListHandler();
@@ -18,13 +21,27 @@ const listHandler = new ListHandler();
 class TaskController extends BaseController {
   async createNewTask(req, res) {
     const { listId, title, projectId } = req.body;
+    const { userId } = req;
     try {
       let errors = await this.getErrorsParameters(req, TASK_SHEME);
       if (errors.length > 0) throw new ValidationError(errors);
+      const project = await projectHandler.getProjectById(projectId);
+      if (!project) throw new ValidationError("PROJECT_IS_NOT_EXIST");
+      const list = await listHandler.getListById(listId);
+      if (!list) throw new ValidationError("LIST_IS_NOT_EXIST");
       const newTask = await taskHandlers.createNewTask(
         listId,
         projectId,
         title
+      );
+      await activeHandler.createNewActive(
+        "ADD_TASK_TO_LIST",
+        projectId,
+        newTask._id,
+        userId,
+        listId,
+        null,
+        null
       );
       this.response(res).onSuccess(newTask);
     } catch (errors) {
@@ -50,6 +67,27 @@ class TaskController extends BaseController {
       if (isExistTask !== -1)
         throw new ValidationError("MEMBERS_IS_ASSIGN_IN_TASK");
       const newTask = await taskHandlers.addMemberToTask(taskId, userId);
+      if (req.userId === userId) {
+        await activeHandler.createNewActive(
+          "ASSIGN_ME_TO_TASK",
+          project._id,
+          taskId,
+          req.userId,
+          null,
+          null,
+          null
+        );
+      } else {
+        await activeHandler.createNewActive(
+          "ASSIGN_MEMBERS_TO_TASK",
+          project._id,
+          taskId,
+          req.userId,
+          null,
+          userId,
+          null
+        );
+      }
       this.response(res).onSuccess(newTask);
     } catch (errors) {
       this.response(res).onError(errors);
@@ -70,6 +108,27 @@ class TaskController extends BaseController {
       if (isExistTask == -1)
         throw new ValidationError("MEMBERS_IS_NOT_IN_TASK");
       const newTask = await taskHandlers.removeMembersToTask(taskId, userId);
+      if (req.userId === userId) {
+        await activeHandler.createNewActive(
+          "REMOVE_ME_TO_TASK",
+          project._id,
+          taskId,
+          req.userId,
+          null,
+          null,
+          null
+        );
+      } else {
+        await activeHandler.createNewActive(
+          "REMOVE_MEMBERS_TO_TASK",
+          project._id,
+          taskId,
+          req.userId,
+          null,
+          userId,
+          null
+        );
+      }
       this.response(res).onSuccess(newTask);
     } catch (errors) {
       this.response(res).onError(errors);
@@ -93,6 +152,15 @@ class TaskController extends BaseController {
       if (task.listId === list._id)
         throw new ValidationError("TASK_IS_IN_LIST");
       const newTask = await taskHandlers.moveTask(taskId, listId);
+      await activeHandler.createNewActive(
+        "MOVE_TASK",
+        project._id,
+        taskId,
+        req.userId,
+        task.listId,
+        null,
+        listId
+      );
       this.response(res).onSuccess(newTask);
     } catch (errors) {
       this.response(res).onError(errors);

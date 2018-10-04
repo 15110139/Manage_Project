@@ -8,6 +8,9 @@ import {
 } from "../validationSchemes/project";
 import ValidationError from "../errors/validation";
 import AuthHandler from "../handlers/auth";
+import ActivetHandler from "../handlers/active";
+
+const activetHandler = new ActivetHandler();
 const authHandler = new AuthHandler();
 const projectHandler = new ProjectlHandler();
 
@@ -47,6 +50,15 @@ class ProjectController extends BaseController {
       const result = await projectHandler.addMembersToProject(
         projectId,
         userId
+      );
+      await activetHandler.createNewActive(
+        "ASSGIN_MEMBER_TO_PROJECT",
+        projectId,
+        null,
+        req.userId,
+        null,
+        userId,
+        null
       );
       this.response(res).onSuccess(result);
     } catch (errors) {
