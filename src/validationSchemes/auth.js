@@ -1,10 +1,7 @@
-export const  LOGIN_VALIDATION_SCHEMA = {
-  email: {
+export const LOGIN_VALIDATION_SCHEMA = {
+  emailOrUserName: {
     notEmpty: true,
-    isEmail: {
-      errorMessage: "INVAILD_EMAIL_PROVIDED"
-    },
-    errorMessage: "EMAIL_NOT_EMPTY"
+    errorMessage: "EMAIL_OR_USERNAME_IS_NOT_EMPTY"
   },
   password: {
     notEmpty: true,
@@ -12,7 +9,7 @@ export const  LOGIN_VALIDATION_SCHEMA = {
       options: [{ min: 6, max: 35 }],
       errorMessage: "INVAILD_PASSWORD_PROVIDED"
     },
-    errorMessage: "PASSWORD_NOT_EMPTY"
+    errorMessage: "PASSWORD_IS_NOT_EMPTY"
   }
 };
 export const RESET_PASSWORD_SCHEMA = {
@@ -27,7 +24,7 @@ export const RESET_PASSWORD_SCHEMA = {
 
 export const REGISTER_VALIDATION_SCHEMA = {
   email: {
-    notEmpty: true,
+    notEmpty: false?
     isEmail: {
       errorMessage: "INVAILD_EMAIL_PROVIDED"
     },
@@ -48,6 +45,14 @@ export const REGISTER_VALIDATION_SCHEMA = {
       errorMessage: "INVAILD_PASSWORD_PROVIDED"
     },
     errorMessage: "PASSWORD_NOT_EMPTY"
+  },
+  firstName: {
+    notEmpty: true,
+    errorMessage: "FIRST_NAME_NOT_EMPTY"
+  },
+  lastName: {
+    notEmpty: true,
+    errorMessage: "LAST_NAME_NOT_EMPTY"
   }
 };
 

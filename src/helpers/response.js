@@ -1,8 +1,7 @@
 import HttpStatus from "http-status-codes";
 
 const BasicResponse = {
-  status: "OK",
-  message: "Successfull",
+  status: "Successfull",
   data: null,
   error: null
 };
@@ -14,37 +13,34 @@ class ResponseHelper {
 
   static getDefaultResponseHandler(res) {
     return {
-      onSuccess: function(data, message, code) {
+      onSuccess: function(data) {
         ResponseHelper.respondWithSuccess(
           res,
-          code || ResponseHelper.HTTP_STATUS.OK,
           data,
-          message
+          ResponseHelper.HTTP_STATUS.OK,
         );
       },
-      onError: function(error) {
+      onError: function(error,status,errorCode) {
         ResponseHelper.respondWithError(
           res,
-          error.status || "NOT_FOUND",
-          error.message || "Unknown error"
+          status||null,
+          error?error.message:null,
+          errorCode
         );
       }
     };
   }
 
-  static respondWithSuccess(res, code, data, message = "Successfull") {
+  static respondWithSuccess(res,data) {
     let response = Object.assign({}, BasicResponse);
-    response.status = "OK";
-    response.message = message;
     response.data = data;
-    res.status(code).json(response);
+    res.status(200).json(response);
   }
 
-  static respondWithError(res, errorCode = 500, message = "failure") {
+  static respondWithError(res,status,error,errorCode = 500) {
     let response = Object.assign({}, BasicResponse);
-    response.success = false;
-    response.message = message;
-    response.status = "NOT_FOUND";
+    response.status = status
+    response.error = error;
     res.status(errorCode).json(response);
   }
 }

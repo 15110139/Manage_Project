@@ -7,18 +7,21 @@ import UserModel from "../models/User";
 // import RevenueModel from "../models/Revenue";
 
 class AuthHandler extends Base {
-  async loginAccount(email, password) {
-    const user = await UserModel.findOne({ email });
+  async loginAccount(emailOrUserName, password) {
+    const user = await UserModel.findOne({$or:[{userName:emailOrUserName},{email:emailOrUserName}]})
+    if(!user) throw new ValidationError("EMAIL_OR_USER_NAME_IS_NOT_EXIST")
     const match = await bcrypt.compare(password, user.password);
     if (match) {
       return user;
     } else return false;
   }
-  async createNewUser(email, password) {
+  async createNewUser(email, password,username,firstName,lastName) {
     const newUser = await UserModel.create({
       email,
       password,
-      projects: []
+      username,
+      firstName,
+      lastName
     });
     return newUser;
   }

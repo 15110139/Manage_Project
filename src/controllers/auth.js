@@ -17,7 +17,9 @@ import {
   CHANGE_PASSWORD_SCHEMA,
   VERIFY_EMAIL_SCHEMA,
   EMAIL_VALIDATE_SCHEMA,
-  RESET_PASSWORD_SCHEMA
+  RESET_PASSWORD_SCHEMA,
+  REGISTER_VALIDATION_SCHEMA,
+  LOGIN_VALIDATION_SCHEMA
 } from "../validationSchemes/auth";
 import ValidationError from "../errors/validation";
 import UserModel from "../models/User";
@@ -27,49 +29,75 @@ class AuthController extends BaseController {
     super();
   }
   async register(req, res) {
-    const data = req.body;
+    const { email, firstName, lastName, username, password } = req.body;
+    //Validate input
+    let errors = await this.getErrorsParameters(
+      req,
+      REGISTER_VALIDATION_SCHEMA
+    );
+    console.log("error", errors);
+    if (errors.length > 0) return this.response(res).onError(null, errors);
     try {
-      //Validate input
-      /*   let errors = await this.getErrorsParameters(
-        req,
-        REGISTER_VALIDATION_SCHEMA
-      );
-      if (errors.length > 0) throw new ValidationError(errors); */
-
       //Handling
       // let username = changeToSlug(data.username);
-      const email = data.email;
-      const password = data.password;
-
       let isExistEmail = await UserModel.findOne({ email });
       if (isExistEmail) {
-        throw new ValidationError("EMAIL_IS_EXIST");
+        throw new ValidationError("EMAIL_ALREADY_IN_USE_BY_ANOTHER_ACCOUNT");
       }
-      const newUser = await authHandler.createNewUser(email, password);
-      this.response(res).onSuccess(newUser);
+      let isExistUserName = await UserModel.findOne({ username });
+      if (isExistUserName) {
+        throw new ValidationError(
+          "USER_NAME_ALREADY_IN_USE_BY_ANOTHER_ACCOUNT"
+        );
+      }
+      let newUser = await authHandler.createNewUser(
+        email,
+        password,
+        username,
+        firstName,
+        lastName
+      );
+      const token = jwt.sign(
+        {
+          userId: newUser._id
+        },
+        config.secret
+      );
+      if (newUser) {
+        newUser = newUser.toObject();
+        delete newUser.password;
+      }
+      const profile = newUser;
+      if (!token) throw new ValidationError("USER_NOTFOUND");
+      this.response(res).onSuccess({ token, profile });
     } catch (errors) {
       this.response(res).onError(errors);
     }
   }
   async login(req, res) {
-    const data = req.body;
+    const { emailOrUserName, password } = req.body;
+    let errors = await this.getErrorsParameters(req, LOGIN_VALIDATION_SCHEMA);
+    if (errors.length > 0) return this.response(res).onError(null, errors);
     try {
-      /*   let errors = await this.getErrorsParameters(req, LOGIN_VALIDATION_SCHEMA);
-      if (errors.length > 0) throw new ValidationError(errors); */
       // if (!user.isEmailVerified)
       //   throw new ValidationError("EMAIL_NOT_VERIFIED");
-      const user = await authHandler.loginAccount(data.email, data.password);
+      let user = await authHandler.loginAccount(emailOrUserName, password);
       if (!user) {
-        throw new ValidationError("EMAIL_OR_PASSWORD_INCORRECT");
+        throw new ValidationError("PASSWORD_INCORRECT");
       }
       const token = jwt.sign(
         {
-          userId: user.id
+          userId: user._id
         },
         config.secret
       );
-      if (!token) throw new ValidationError("EMAIL_OR_PASSWORD_NOTFOUND");
-      this.response(res).onSuccess({ token });
+      if (user) {
+        user = user.toObject();
+        delete user.password;
+      }
+      const profile = user;
+      if (!token) throw new ValidationError("USER_NOTFOUND");
+      this.response(res).onSuccess({ profile, token });
     } catch (errors) {
       this.response(res).onError(errors);
     }
