@@ -17,29 +17,29 @@ class ResponseHelper {
         ResponseHelper.respondWithSuccess(
           res,
           data,
-          ResponseHelper.HTTP_STATUS.OK,
+          ResponseHelper.HTTP_STATUS.OK
         );
       },
-      onError: function(error,status,errorCode) {
+      onError: function(error, status, errorCode) {
         ResponseHelper.respondWithError(
           res,
-          status||null,
-          error?error.message:null,
+          error || null,
+          status ? status.message : null,
           errorCode
         );
       }
     };
   }
 
-  static respondWithSuccess(res,data) {
+  static respondWithSuccess(res, data) {
     let response = Object.assign({}, BasicResponse);
     response.data = data;
     res.status(200).json(response);
   }
 
-  static respondWithError(res,status,error,errorCode = 500) {
+  static respondWithError(res, error, status, errorCode = 500) {
     let response = Object.assign({}, BasicResponse);
-    response.status = status
+    response.status = status;
     response.error = error;
     res.status(errorCode).json(response);
   }

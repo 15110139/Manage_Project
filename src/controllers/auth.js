@@ -35,8 +35,8 @@ class AuthController extends BaseController {
       req,
       REGISTER_VALIDATION_SCHEMA
     );
-    console.log("error", errors);
-    if (errors.length > 0) return this.response(res).onError(null, errors);
+    if (errors.length > 0)
+      return this.response(res).onError("INVALID_ARGUMENT");
     try {
       //Handling
       // let username = changeToSlug(data.username);
@@ -71,13 +71,14 @@ class AuthController extends BaseController {
       if (!token) throw new ValidationError("USER_NOTFOUND");
       this.response(res).onSuccess({ token, profile });
     } catch (errors) {
-      this.response(res).onError(errors);
+      this.response(res).onError(null, errors);
     }
   }
   async login(req, res) {
-    const { emailOrUserName, password } = req.body;
+    const { emailOrUserName, password, remember } = req.body;
     let errors = await this.getErrorsParameters(req, LOGIN_VALIDATION_SCHEMA);
-    if (errors.length > 0) return this.response(res).onError(null, errors);
+    if (errors.length > 0)
+      return this.response(res).onError("INVALID_ARGUMENT");
     try {
       // if (!user.isEmailVerified)
       //   throw new ValidationError("EMAIL_NOT_VERIFIED");
@@ -99,7 +100,7 @@ class AuthController extends BaseController {
       if (!token) throw new ValidationError("USER_NOTFOUND");
       this.response(res).onSuccess({ profile, token });
     } catch (errors) {
-      this.response(res).onError(errors);
+      this.response(res).onError(null, errors);
     }
   }
 
@@ -112,7 +113,7 @@ class AuthController extends BaseController {
         updated = await authHandler.updateInformationByUserId(req.userId, data);
       this.response(res).onSuccess(updated);
     } catch (errors) {
-      this.response(res).onError(errors);
+      this.response(res).onError(null, errors);
     }
   }
   async findUserByEmail(email) {
