@@ -1,18 +1,21 @@
 import ValidationError from "../errors/validation";
 import Base from "./base";
 var bcrypt = require("bcrypt");
-//Import models
 import UserModel from "../models/User";
-
-// import RevenueModel from "../models/Revenue";
+import validator from "validator";
 
 class AuthHandler extends Base {
   async loginAccount(emailOrUserName, password) {
-    let user = await UserModel.findOne({ email: emailOrUserName });
-    if (!user) {
+    const isEmail = validator.isEmail(emailOrUserName); //=> true
+    let user = {};
+    if (isEmail) {
+      user = await UserModel.findOne({ email: emailOrUserName });
+      if (!user) throw new ValidationError("EMAIL_IS_NOT_EXIST");
+    } else {
       user = await UserModel.findOne({ username: emailOrUserName });
+      if (!user) throw new ValidationError("USER_NAME_IS_NOT_EXIST");
     }
-    if (!user) throw new ValidationError("EMAIL_OR_USER_NAME_IS_NOT_EXIST");
+
     const match = await bcrypt.compare(password, user.password);
     if (match) {
       return user;
