@@ -8,14 +8,17 @@ import UserModel from "../models/User";
 
 class AuthHandler extends Base {
   async loginAccount(emailOrUserName, password) {
-    const user = await UserModel.findOne({$or:[{userName:emailOrUserName},{email:emailOrUserName}]})
-    if(!user) throw new ValidationError("EMAIL_OR_USER_NAME_IS_NOT_EXIST")
+    let user = await UserModel.findOne({ email: emailOrUserName });
+    if (!user) {
+      user = await UserModel.findOne({ username: emailOrUserName });
+    }
+    if (!user) throw new ValidationError("EMAIL_OR_USER_NAME_IS_NOT_EXIST");
     const match = await bcrypt.compare(password, user.password);
     if (match) {
       return user;
     } else return false;
   }
-  async createNewUser(email, password,username,firstName,lastName) {
+  async createNewUser(email, password, username, firstName, lastName) {
     const newUser = await UserModel.create({
       email,
       password,
