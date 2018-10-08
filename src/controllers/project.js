@@ -16,28 +16,25 @@ const projectHandler = new ProjectlHandler();
 
 class ProjectController extends BaseController {
   async createNewProjectByUser(req, res) {
-    let data = req.body;
+    let { backgroundUrl, name } = req.body;
+    let errors = await this.getErrorsParameters(req, PROJECT_SHEME);
+    if (errors.length > 0) this.response(res).onError("INVALID_ARGUMENT");
     try {
-      let errors = await this.getErrorsParameters(req, PROJECT_SHEME);
-      if (errors.length > 0) throw new ValidationError(errors);
       let newProject = await projectHandler.createNewProject(
         req.userId,
-        data.name,
-        data.backgroundUrl
+        name,
+        backgroundUrl
       );
       this.response(res).onSuccess(newProject);
     } catch (errors) {
-      this.response(res).onError(errors);
+      this.response(res).onError(null, errors);
     }
   }
   async addMembersToProject(req, res) {
     const { userId, projectId } = req.body;
+    const errors = await this.getErrorsParameters(req, ADD_MEMBERS_TO_PROJECT);
+    if (errors.length > 0) this.response(res).onError("INVALID_ARGUMENT");
     try {
-      const errors = await this.getErrorsParameters(
-        req,
-        ADD_MEMBERS_TO_PROJECT
-      );
-      if (errors.length > 0) throw new ValidationError(errors);
       const user = await authHandler.getUserById(userId);
       if (!user) throw new ValidationError("USER_NOT_FOUND");
       const project = await projectHandler.getProjectById(projectId);
@@ -62,15 +59,15 @@ class ProjectController extends BaseController {
       );
       this.response(res).onSuccess(result);
     } catch (errors) {
-      this.response(res).onError(errors);
+      this.response(res).onError(null, errors);
     }
   }
 
   async removeMembersToProject(req, res) {
     const { projectId, userId } = req.body;
+    let errors = await this.getErrorsParameters(req, ADD_MEMBERS_TO_PROJECT);
+    if (errors.length > 0) this.response(res).onError("INVALID_ARGUMENT");
     try {
-      let errors = await this.getErrorsParameters(req, ADD_MEMBERS_TO_PROJECT);
-      if (errors.length > 0) throw new ValidationError(errors);
       const project = await projectHandler.getProjectById(projectId);
       const listMembersInProject = project.members;
       const isExistProject = listMembersInProject.indexOf(userId);
@@ -82,7 +79,7 @@ class ProjectController extends BaseController {
       );
       this.response(res).onSuccess(newProject);
     } catch (errors) {
-      this.response(res).onError(errors);
+      this.response(res).onError(null, errors);
     }
   }
   async getListProjectByUser(req, res) {
@@ -97,7 +94,7 @@ class ProjectController extends BaseController {
       const projects = projectsCreateByUser.concat(projectsIsMembers);
       this.response(res).onSuccess(projects);
     } catch (errors) {
-      this.response(res).onError(errors);
+      this.response(res).onError(null, errors);
     }
   }
 }

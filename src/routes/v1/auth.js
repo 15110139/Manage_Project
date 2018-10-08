@@ -38,6 +38,8 @@ router.put(
   authentication,
   authController.updatePasswordByUserId
 );
+
+router.post("/me",authController.me)
 //Routers method DELETE
 
 router.post("/resetPassword", authController.resetPassword);

@@ -16,9 +16,9 @@ const commentHandlers = new CommentHandlers();
 class CommentController extends BaseController {
   async createNewComment(req, res) {
     const { taskId, userId, tag, content } = req.body;
+    let errors = await this.getErrorsParameters(req, COMMENT_SHEME);
+    if (errors.length > 0) this.response(res).onSuccess("INVALID_ARGUMENT");
     try {
-      let errors = await this.getErrorsParameters(req, COMMENT_SHEME);
-      if (errors.length > 0) throw new ValidationError(errors);
       const user = await authHandler.getUserById(userId);
       if (!user) throw new ValidationError("USER_IS_NOT_EXIST");
       const task = await taskHandler.getTaskById(taskId);

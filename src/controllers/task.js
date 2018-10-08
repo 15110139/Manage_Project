@@ -10,10 +10,8 @@ import ValidationError from "../errors/validation";
 import TaskHandlers from "../handlers/task";
 import ProjectHandler from "../handlers/project";
 import ListHandler from "../handlers/list";
-import NotifycationHandler from "../handlers/notifycation";
 import ActiveHandler from "../handlers/active";
 const activeHandler = new ActiveHandler();
-const notifycationHandler = new NotifycationHandler();
 const taskHandlers = new TaskHandlers();
 const projectHandler = new ProjectHandler();
 const listHandler = new ListHandler();
@@ -22,9 +20,9 @@ class TaskController extends BaseController {
   async createNewTask(req, res) {
     const { listId, title, projectId } = req.body;
     const { userId } = req;
+    let errors = await this.getErrorsParameters(req, TASK_SHEME);
+    if (errors.length > 0) this.response(res).onError("INVALID_ARGUMENT");
     try {
-      let errors = await this.getErrorsParameters(req, TASK_SHEME);
-      if (errors.length > 0) throw new ValidationError(errors);
       const project = await projectHandler.getProjectById(projectId);
       if (!project) throw new ValidationError("PROJECT_IS_NOT_EXIST");
       const list = await listHandler.getListById(listId);
@@ -45,18 +43,15 @@ class TaskController extends BaseController {
       );
       this.response(res).onSuccess(newTask);
     } catch (errors) {
-      this.response(res).onError(errors);
+      this.response(res).onError(null, errors);
     }
   }
 
   async addMemberToTask(req, res) {
     const { taskId, userId } = req.body;
+    let errors = await this.getErrorsParameters(req, ADD_MEMBERS_TO_TASK_SHEME);
+    if (errors.length > 0) this.response(res).onError("INVALID_ARGUMENT");
     try {
-      let errors = await this.getErrorsParameters(
-        req,
-        ADD_MEMBERS_TO_TASK_SHEME
-      );
-      if (errors.length > 0) throw new ValidationError(errors);
       const task = await taskHandlers.getTaskById(taskId);
       const project = await projectHandler.getProjectById(task.projectId);
       const listMembersInProject = project.members;
@@ -90,18 +85,15 @@ class TaskController extends BaseController {
       }
       this.response(res).onSuccess(newTask);
     } catch (errors) {
-      this.response(res).onError(errors);
+      this.response(res).onError(null, errors);
     }
   }
 
   async removeMembersToTask(req, res) {
     const { taskId, userId } = req.body;
+    let errors = await this.getErrorsParameters(req, ADD_MEMBERS_TO_TASK_SHEME);
+    if (errors.length > 0) this.response(res).onError("INVALID_ARGUMENT");
     try {
-      let errors = await this.getErrorsParameters(
-        req,
-        ADD_MEMBERS_TO_TASK_SHEME
-      );
-      if (errors.length > 0) throw new ValidationError(errors);
       const task = await taskHandlers.getTaskById(taskId);
       const listMembersInTask = task.members;
       const isExistTask = listMembersInTask.indexOf(userId);
@@ -131,18 +123,18 @@ class TaskController extends BaseController {
       }
       this.response(res).onSuccess(newTask);
     } catch (errors) {
-      this.response(res).onError(errors);
+      this.response(res).onError(null, errors);
     }
   }
 
   async moveTask(req, res) {
     const { taskId, listId } = req.body;
+    let errors = await this.getErrorsParameters(
+      req,
+      SWITCH_TASK_BETWEEN_TWO_LIST
+    );
+    if (errors.length > 0) this.response(res).onError("INVALID_ARGUMENT");
     try {
-      let errors = await this.getErrorsParameters(
-        req,
-        SWITCH_TASK_BETWEEN_TWO_LIST
-      );
-      if (errors.length > 0) throw new ValidationError(errors);
       const task = await taskHandlers.getTaskById(taskId);
       const list = await listHandler.getListById(listId);
       if (!task) throw new ValidationError("TASK_IS_NOT_EXIST");
@@ -163,15 +155,15 @@ class TaskController extends BaseController {
       );
       this.response(res).onSuccess(newTask);
     } catch (errors) {
-      this.response(res).onError(errors);
+      this.response(res).onError(null, errors);
     }
   }
 
   async getTasksByListId(req, res) {
     const { listId } = req.body;
     const { userId } = req;
+    if (!listId) this.response(res).onError("INVALID_ARGUMENT");
     try {
-      if (!listId) throw new ValidationError("LIST_ID_IS_NOT_EMPTY");
       const list = await listHandler.getListById(listId);
       if (!list) throw new ValidationError("LIST_IS_NOT_EXIST");
       const project = await projectHandler.getProjectById(list.projectId);
@@ -184,7 +176,7 @@ class TaskController extends BaseController {
       const tasks = await taskHandlers.getTasksByListId();
       this.response(res).onSuccess(tasks);
     } catch (errors) {
-      this.response(res).onError(errors);
+      this.response(res).onError(null, errors);
     }
   }
 }

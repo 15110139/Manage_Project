@@ -1,27 +1,60 @@
 import ResponseHelper from "../helpers/response";
 const jwt = require("jsonwebtoken");
 const config = require("./config");
+import TokenHandler from "../handlers/token";
 
-const authenticate = (req, res, next) => {
+const tokenHandler = new TokenHandler();
+const authenticate = function(req, res, next) {
   const token =
     req.body.token || req.query.token || req.headers["access-token"];
-  // decode token
-  if (token) {
-    // verifies secret and checks exp
-    jwt.verify(token, config.secret, function(err, decoded) {
-      if (err) {
-        ResponseHelper.respondWithError(
-          res,
-          error.status || 401,
-          error.message || "Unauthorized access"
+  if (!token)
+    throw ResponseHelper.respondWithError(res, null, "NO_TOKEN_PROVIDED");
+  try {
+    jwt.verify(token, config.secret, async function(err, decoded) {
+      if (err && err.message === "invalid token") throw "INVALID_TOKEN";
+      if (err && err.message === "jwt expired") {
+        console.log("het han");
+        const refresherToken = await tokenHandler.getTokenByToken(token);
+        console.log("refresherToken", refresherToken);
+        if (!refresherToken)
+          return ResponseHelper.respondWithError(res, "INVALID_TOKEN", null);
+        jwt.verify(
+          refresherToken.refreshToken,
+          config.refreshTokenSecret,
+          async (err, decoded) => {
+            if (err) {
+              console.log("error refresherToken", err);
+              console.log("refresherToken het hang");
+              await tokenHandler.deleteToken(refresherToken.refreshToken);
+              return ResponseHelper.respondWithError(
+                res,
+                "INVALID_TOKEN",
+                null
+              );
+            }
+            const token = jwt.sign(
+              { userId: refresherToken.userId },
+              config.secret,
+              {
+                expiresIn: config.tokenLife
+              }
+            );
+            await tokenHandler.updateToken(token, refresherToken.refreshToken);
+            return ResponseHelper.respondWithSuccess(
+              res,
+              { token },
+              "NEW_TOKEN"
+            );
+          }
         );
       }
+
       req.userId = decoded.userId;
-      req.fullName = decoded.fullName;
-      next();
+      return next();
     });
-  } else {
-    ResponseHelper.respondWithError(res, 403, "No token provided");
+  } catch (error) {
+    console.log("error", error);
+    ResponseHelper.respondWithError(res, error, null);
   }
 };
 export default authenticate;

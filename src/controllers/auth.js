@@ -1,7 +1,9 @@
 import BaseController from "./base";
 import AuthHandler from "../handlers/auth";
 import EmailHandler from "../handlers/email";
+import TokenHandler from "../handlers/token";
 
+const tokenHanhler = new TokenHandler();
 let authHandler = new AuthHandler();
 let emailHandler = new EmailHandler();
 import emailConfig from "../../config/email";
@@ -11,6 +13,7 @@ const config = require("../middlewares/config");
 import moment from "moment";
 import sha256 from "sha256";
 const jwt = require("jsonwebtoken");
+const tokenList = {};
 //Import validate input scheme
 import {
   UPDATE_AVATAR_VALIDATE_SCHEMA,
@@ -28,6 +31,7 @@ class AuthController extends BaseController {
   constructor() {
     super();
   }
+
   async register(req, res) {
     const { email, firstName, lastName, username, password } = req.body;
     //Validate input
@@ -57,12 +61,25 @@ class AuthController extends BaseController {
         firstName,
         lastName
       );
+
       const token = jwt.sign(
         {
           userId: newUser._id
         },
-        config.secret
+        config.secret,
+        {
+          expiresIn: config.tokenLife
+        }
       );
+
+      const refreshToken = jwt.sign(
+        { userId: newUser._id },
+        config.refreshTokenSecret,
+        {
+          expiresIn: config.refreshTokenLife
+        }
+      );
+      await tokenHanhler.createNewToken(token, refreshToken, newUser._id);
       if (newUser) {
         newUser = newUser.toObject();
         delete newUser.password;
@@ -86,19 +103,39 @@ class AuthController extends BaseController {
       if (!user) {
         throw new ValidationError("PASSWORD_INCORRECT");
       }
-      const token = jwt.sign(
-        {
-          userId: user._id
-        },
-        config.secret
-      );
+
+      const dataToken = await tokenHanhler.getTokenByUser(user._id);
       if (user) {
         user = user.toObject();
         delete user.password;
       }
+
       const profile = user;
-      if (!token) throw new ValidationError("USER_NOTFOUND");
-      this.response(res).onSuccess({ profile, token });
+      const token = jwt.sign(
+        {
+          userId: user._id
+        },
+        config.secret,
+        {
+          expiresIn: remember ? 2592000 : config.tokenLife // expires in 24 hours
+        }
+      );
+      if (dataToken) {
+        await tokenHanhler.updateToken(token, dataToken.refreshToken);
+        if (!token) throw new ValidationError("USER_NOTFOUND");
+        this.response(res).onSuccess({ profile, token });
+      } else {
+        const refreshToken = jwt.sign(
+          { userId: user._id },
+          config.refreshTokenSecret,
+          {
+            expiresIn: remember ? 3592000 : config.refreshTokenLife
+          }
+        );
+        await tokenHanhler.createNewToken(token, refreshToken);
+        if (!token) throw new ValidationError("USER_NOTFOUND");
+        this.response(res).onSuccess({ profile, token });
+      }
     } catch (errors) {
       this.response(res).onError(null, errors);
     }
@@ -258,23 +295,20 @@ class AuthController extends BaseController {
    * Result: information of user
    */
   async me(req, res, next) {
+    const { _id, refreshToken } = req.body;
     try {
-      let user = await authHandler.getInformationByUserId(req.userId);
-      return this.response(res).onSuccess({ user });
+      if (
+        refreshToken in refreshTokens &&
+        refreshTokens[refreshToken] === _id
+      ) {
+        const token = jwt.sign({ userId: _id }, config.refreshTokenSecret, {
+          expiresIn: 7200
+        });
+        this.response(res).onSuccess({ token });
+      } else throw new ValidationError("INVAIL_TOKEN");
     } catch (errors) {
       console.log(errors);
-      return this.response(res).onError(errors);
-    }
-  }
-
-  async remove2Fa(req, res, next) {
-    try {
-      let isAvailable = await authHandler.isHave2Fa(req.userId);
-      if (!isAvailable) throw new ValidationError("2FA_NOT_EXISTS");
-      let remove = await authHandler.removeUser2Fa(req.userId);
-      return this.response(res).onSuccess("SUCCESS");
-    } catch (error) {
-      return this.response(res).onError(error);
+      return this.response(res).onError(null, errors);
     }
   }
 
