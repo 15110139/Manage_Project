@@ -22,6 +22,11 @@ class ListHandlers extends Base {
     return newList;
   }
 
+  async getListByName(listName) {
+    const list = await ListModel.findOne({ name: listName });
+    return list;
+  }
+
   async getListsByProjectId(projectId) {
     const lists = await ListModel.find({ projectId });
     return lists;

@@ -2,6 +2,6 @@
   "secret": "tien123123",
   "refreshTokenSecret": "tien123123123",
   "port": 3000,
-  "tokenLife": 60,
+  "tokenLife": 7200,
   "refreshTokenLife": 86400
 }

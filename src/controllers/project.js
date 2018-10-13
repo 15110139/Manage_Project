@@ -24,6 +24,8 @@ class ProjectController extends BaseController {
     let errors = await this.getErrorsParameters(req, PROJECT_SHEME);
     if (errors.length > 0) this.response(res).onError("INVALID_ARGUMENT");
     try {
+      const project = await projectHandler.getProjectByName(name);
+      if (project) throw new ValidationError("DUPLICATE_NAME");
       let newProject = await projectHandler.createNewProject(
         req.userId,
         name,

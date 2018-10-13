@@ -14,6 +14,10 @@ class TaskHandler extends Base {
     });
     return newTask;
   }
+  async getTaskByTitle(taskTitle) {
+    const task = await TaskModel.findOne({ title: taskTitle });
+    return task;
+  }
   async getTaskById(taskId) {
     const task = await TaskModel.findOne({ _id: taskId });
     return task;

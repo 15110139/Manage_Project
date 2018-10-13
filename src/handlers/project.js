@@ -25,6 +25,11 @@ class ProjectHandler extends Base {
     return project;
   }
 
+  async getProjectByName(projectName) {
+    const project = await ProjectModel.findOne({ name: projectName });
+    return project;
+  }
+
   async removeMembersToProject(projectId, userId) {
     console.log("position", userId, projectId);
     const result = await ProjectModel.updateOne(

@@ -23,6 +23,8 @@ class TaskController extends BaseController {
     let errors = await this.getErrorsParameters(req, TASK_SHEME);
     if (errors.length > 0) this.response(res).onError("INVALID_ARGUMENT");
     try {
+      const task = await taskHandlers.getTaskByTitle(title);
+      if (task) throw new ValidationError("DUPLICATE_NAME");
       const project = await projectHandler.getProjectById(projectId);
       if (!project) throw new ValidationError("PROJECT_IS_NOT_EXIST");
       const list = await listHandler.getListById(listId);
