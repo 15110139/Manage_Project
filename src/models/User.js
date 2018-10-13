@@ -31,6 +31,9 @@ const UserSchema = new mongoose.Schema(
     avatarUrl: {
       type: String,
       default: ""
+    },
+    fullName:{
+      type:String
     }
   },
   { timestamps: true }

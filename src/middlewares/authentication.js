@@ -13,9 +13,7 @@ const authenticate = function(req, res, next) {
     jwt.verify(token, config.secret, async function(err, decoded) {
       if (err && err.message === "invalid token") throw "INVALID_TOKEN";
       if (err && err.message === "jwt expired") {
-        console.log("het han");
         const refresherToken = await tokenHandler.getTokenByToken(token);
-        console.log("refresherToken", refresherToken);
         if (!refresherToken)
           return ResponseHelper.respondWithError(res, "INVALID_TOKEN", null);
         jwt.verify(
@@ -23,8 +21,6 @@ const authenticate = function(req, res, next) {
           config.refreshTokenSecret,
           async (err, decoded) => {
             if (err) {
-              console.log("error refresherToken", err);
-              console.log("refresherToken het hang");
               await tokenHandler.deleteToken(refresherToken.refreshToken);
               return ResponseHelper.respondWithError(
                 res,
@@ -48,12 +44,10 @@ const authenticate = function(req, res, next) {
           }
         );
       }
-
       req.userId = decoded.userId;
       return next();
     });
   } catch (error) {
-    console.log("error", error);
     ResponseHelper.respondWithError(res, error, null);
   }
 };

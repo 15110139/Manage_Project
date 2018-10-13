@@ -9,7 +9,11 @@ import {
 import ValidationError from "../errors/validation";
 import AuthHandler from "../handlers/auth";
 import ActivetHandler from "../handlers/active";
+import TaskHandler from "../handlers/task";
+import ListHandler from "../handlers/list";
 
+const listHandler = new ListHandler();
+const taskHandler = new TaskHandler();
 const activetHandler = new ActivetHandler();
 const authHandler = new AuthHandler();
 const projectHandler = new ProjectlHandler();
@@ -93,6 +97,90 @@ class ProjectController extends BaseController {
       );
       const projects = projectsCreateByUser.concat(projectsIsMembers);
       this.response(res).onSuccess(projects);
+    } catch (errors) {
+      this.response(res).onError(null, errors);
+    }
+  }
+
+  async getProjectAndListAndTaskByTaskId(req, res) {
+    const { taskId } = req.body;
+    if (!taskId) his.response(res).onError("INVALID_ARGUMENT");
+
+    try {
+      const task = await taskHandler.getTaskById(taskId);
+      if (!task) throw new ValidationError("TASK_IS_NOT_EXIST");
+      let project = await projectHandler.getProjectById(task.projectId);
+      if (!project) throw new ValidationError("PROJECT_IS_NOT_EXIST");
+      if (project.userId !== userId) {
+        const membersInProject = project.members;
+        if (membersInProject.indexOf(userId) == -1)
+          throw new ValidationError("USER_IS_NOT_IN_PROJECT");
+      }
+      let lists = await listHandlers.getListsByProjectId(projectId);
+      let newlistAndTask = await lists.map(async function(el) {
+        const tasks = await taskHandler.getTasksByListId(el._id);
+        return {
+          _id: el._id,
+          createdAt: el.createdAt,
+          projectId: el.projectId,
+          name: el.name,
+          tasks: tasks
+        };
+      });
+
+      let newlist = await Promise.all(newlistAndTask);
+      const newProject = Object.assign(project, {
+        lists: newlist
+      });
+      this.response(res).onSuccess(newProject);
+    } catch (errors) {
+      this.response(res).onError(null, errors);
+    }
+  }
+
+  async getListAndTaskByProjectId(req, res) {
+    const { projectId } = req.body;
+    const { userId } = req;
+    if (!projectId) this.response(res).onError("INVALID_ARGUMENT");
+    try {
+      let project = await projectHandler.getProjectById(projectId);
+      if (!project) throw new ValidationError("PROJECT_IS_NOT_EXIST");
+      if (project.userId !== userId) {
+        const membersInProject = project.members;
+        if (membersInProject.indexOf(userId) == -1)
+          throw new ValidationError("USER_IS_NOT_IN_PROJECT");
+      }
+      const data = await projectHandler.getListAndTaskByProjectId(projectId);
+      const newProject = Object.assign(project.toObject(), {
+        lists: data
+      });
+      this.response(res).onSuccess(newProject);
+    } catch (errors) {
+      this.response(res).onError(null, errors);
+    }
+  }
+
+  async getProjectAndListAndTaskByTaskId(req, res) {
+    const { taskId } = req.body;
+    const { userId } = req;
+    if (!taskId) this.response(res).onError("INVALID_ARGUMENT");
+    try {
+      let task = await taskHandler.getTaskById(taskId);
+      console.log("task", task);
+      if (!task) throw new ValidationError("TASK_IS_NOT_EXIST");
+      let project = await projectHandler.getProjectById(task.projectId);
+      if (!project) throw new ValidationError("PROJECT_IS_NOT_EXIST");
+      if (project.userId !== userId) {
+        const membersInProject = project.members;
+        if (membersInProject.indexOf(userId) == -1)
+          throw new ValidationError("USER_IS_NOT_IN_PROJECT");
+      }
+      const data = await projectHandler.getListAndTaskByProjectId(project._id);
+      const newProject = Object.assign(project.toObject(), {
+        lists: data
+      });
+      const newData = { project: newProject, task: task };
+      this.response(res).onSuccess(newData);
     } catch (errors) {
       this.response(res).onError(null, errors);
     }

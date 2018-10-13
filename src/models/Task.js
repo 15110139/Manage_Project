@@ -10,6 +10,9 @@ const TaskSchema = new mongoose.Schema(
     title: {
       type: String
     },
+    position: {
+      type: Number
+    },
     describe: {
       type: String
     },

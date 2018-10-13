@@ -27,10 +27,12 @@ class TaskController extends BaseController {
       if (!project) throw new ValidationError("PROJECT_IS_NOT_EXIST");
       const list = await listHandler.getListById(listId);
       if (!list) throw new ValidationError("LIST_IS_NOT_EXIST");
+      const listTask = await taskHandlers.getTasksByListId(listId);
       const newTask = await taskHandlers.createNewTask(
         listId,
         projectId,
-        title
+        title,
+        listTask.length + 1
       );
       await activeHandler.createNewActive(
         "ADD_TASK_TO_LIST",
@@ -128,12 +130,13 @@ class TaskController extends BaseController {
   }
 
   async moveTask(req, res) {
-    const { taskId, listId } = req.body;
+    const { taskId, listId, position } = req.body;
     let errors = await this.getErrorsParameters(
       req,
       SWITCH_TASK_BETWEEN_TWO_LIST
     );
     if (errors.length > 0) this.response(res).onError("INVALID_ARGUMENT");
+    if (parseInt(position) < 0) this.response(res).onError("INVALID_ARGUMENT");
     try {
       const task = await taskHandlers.getTaskById(taskId);
       const list = await listHandler.getListById(listId);
@@ -141,18 +144,23 @@ class TaskController extends BaseController {
       if (!list) throw new ValidationError("LIST_IS_NOT_EXIST");
       if (task.projecId !== list.projectId)
         throw new ValidationError("TASK_IS_NOT_IN_PROJECT");
-      if (task.listId === list._id)
-        throw new ValidationError("TASK_IS_IN_LIST");
-      const newTask = await taskHandlers.moveTask(taskId, listId);
-      await activeHandler.createNewActive(
-        "MOVE_TASK",
-        project._id,
-        taskId,
-        req.userId,
-        task.listId,
-        null,
-        listId
-      );
+      await taskHandlers.moveTask(taskId, listId, position);
+      if (!task.listId === listId) {
+        await taskHandlers.updatePosition(listId, taskId, position, true);
+        await taskHandlers.updatePosition(task.listId, taskId, position, false);
+
+        await activeHandler.createNewActive(
+          "MOVE_TASK",
+          project._id,
+          taskId,
+          req.userId,
+          task.listId,
+          null,
+          listId
+        );
+      } else {
+        await taskHandlers.updatePosition(listId, taskId, position, true);
+      }
       this.response(res).onSuccess(newTask);
     } catch (errors) {
       this.response(res).onError(null, errors);

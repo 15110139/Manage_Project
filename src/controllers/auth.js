@@ -54,12 +54,15 @@ class AuthController extends BaseController {
           "USER_NAME_ALREADY_IN_USE_BY_ANOTHER_ACCOUNT"
         );
       }
+      const fullName = firstName + " " + lastName;
+
       let newUser = await authHandler.createNewUser(
         email,
         password,
         username,
         firstName,
-        lastName
+        lastName,
+        fullName
       );
 
       const token = jwt.sign(
@@ -103,8 +106,6 @@ class AuthController extends BaseController {
       if (!user) {
         throw new ValidationError("PASSWORD_INCORRECT");
       }
-
-      const dataToken = await tokenHanhler.getTokenByUser(user._id);
       if (user) {
         user = user.toObject();
         delete user.password;
@@ -120,9 +121,11 @@ class AuthController extends BaseController {
           expiresIn: remember ? 2592000 : config.tokenLife // expires in 24 hours
         }
       );
+      const dataToken = await tokenHanhler.getTokenByUser(user._id);
       if (dataToken) {
         await tokenHanhler.updateToken(token, dataToken.refreshToken);
         if (!token) throw new ValidationError("USER_NOTFOUND");
+        console.log("ok");
         this.response(res).onSuccess({ profile, token });
       } else {
         const refreshToken = jwt.sign(
@@ -132,11 +135,12 @@ class AuthController extends BaseController {
             expiresIn: remember ? 3592000 : config.refreshTokenLife
           }
         );
-        await tokenHanhler.createNewToken(token, refreshToken);
+        await tokenHanhler.createNewToken(token, refreshToken, user._id);
         if (!token) throw new ValidationError("USER_NOTFOUND");
         this.response(res).onSuccess({ profile, token });
       }
     } catch (errors) {
+      console.log("errors", errors);
       this.response(res).onError(null, errors);
     }
   }

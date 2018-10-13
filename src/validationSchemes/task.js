@@ -31,6 +31,10 @@ export const ADD_MEMBERS_TO_TASK_SHEME = {
 };
 
 export const SWITCH_TASK_BETWEEN_TWO_LIST = {
+  position: {
+    notEmpty: true,
+    errorMessage: "LIST_ID_IS_EMPTY"
+  },
   listId: {
     notEmpty: true,
     errorMessage: "LIST_ID_IS_EMPTY"

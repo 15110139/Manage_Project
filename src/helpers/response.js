@@ -13,8 +13,8 @@ class ResponseHelper {
 
   static getDefaultResponseHandler(res) {
     return {
-      onSuccess: function(data) {
-        ResponseHelper.respondWithSuccess(res, data);
+      onSuccess: function(data, status) {
+        ResponseHelper.respondWithSuccess(res, data, status);
       },
       onError: function(error, status, errorCode) {
         ResponseHelper.respondWithError(
@@ -27,10 +27,10 @@ class ResponseHelper {
     };
   }
 
-  static respondWithSuccess(res, data) {
+  static respondWithSuccess(res, data, status) {
     let response = Object.assign({}, BasicResponse);
     response.data = data;
-    response.status = status;
+    response.status = status ? status : "Successfull";
     res.status(200).json(response);
   }
 

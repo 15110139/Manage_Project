@@ -29,4 +29,15 @@ router.get(
   projectController.getListProjectByUser
 );
 
+router.post(
+  "/getListAndTaskByProjectId",
+  authentication,
+  projectController.getListAndTaskByProjectId
+);
+router.post(
+  "/getProjectAndListAndTaskByTaskId",
+  authentication,
+  projectController.getProjectAndListAndTaskByTaskId
+);
+
 export default router;

@@ -21,13 +21,21 @@ class AuthHandler extends Base {
       return user;
     } else return false;
   }
-  async createNewUser(email, password, username, firstName, lastName) {
+  async createNewUser(
+    email,
+    password,
+    username,
+    firstName,
+    lastName,
+    fullName
+  ) {
     const newUser = await UserModel.create({
       email,
       password,
       username,
       firstName,
-      lastName
+      lastName,
+      fullName
     });
     return newUser;
   }

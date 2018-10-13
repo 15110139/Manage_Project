@@ -104,35 +104,9 @@ class ListController extends BaseController {
       this.response(res).onError(null, errors);
     }
   }
-  async getListAndTaskByProjectId(req, res) {
-    const { projectId } = req.body;
-    const { userId } = req;
-    if (!projectId) this.response(res).onError("INVALID_ARGUMENT");
-    try {
-      const project = await projectHandler.getProjectById(projectId);
-      if (!project) throw new ValidationError("PROJECT_IS_NOT_EXIST");
-      if (project.userId !== userId) {
-        const membersInProject = project.members;
-        if (membersInProject.indexOf(userId) == -1)
-          throw new ValidationError("USER_IS_NOT_IN_PROJECT");
-      }
-      let lists = await listHandlers.getListsByProjectId(projectId);
-      let newlistAndTask = await lists.map(async function(el) {
-        const tasks = await taskHandler.getTasksByListId(el._id);
-        return {
-          _id: el._id,
-          createdAt: el.createdAt,
-          projectId: el.projectId,
-          name: el.name,
-          tasks: tasks
-        };
-      });
-      let newlist = await Promise.all(newlistAndTask);
-      this.response(res).onSuccess(newlist);
-    } catch (errors) {
-      this.response(res).onError(null, errors);
-    }
-  }
+
 }
+
+
 
 export default ListController;

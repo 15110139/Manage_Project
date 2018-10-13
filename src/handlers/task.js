@@ -3,9 +3,10 @@ import Base from "./base";
 import TaskModel from "../models/Task";
 
 class TaskHandler extends Base {
-  async createNewTask(listId, projectId, title) {
+  async createNewTask(listId, projectId, title, position) {
     const newTask = await TaskModel.create({
       title,
+      position,
       projectId,
       listId,
       members: [],
@@ -36,9 +37,25 @@ class TaskHandler extends Base {
   async moveTask(taskId, listId) {
     const newTask = await TaskModel.updateOne(
       { _id: taskId },
-      { listId: listId }
+      { listId: listId },
+      {
+        position: position
+      }
     );
     return newTask;
+  }
+
+  async updatePosition(listId, taskId, position, value) {
+    await TaskModel.updateMany(
+      {
+        position: { $gte: position },
+        _id: !taskId,
+        listId: listId
+      },
+      {
+        $inc: { position: value ? 1 : -1 }
+      }
+    );
   }
 
   async getTasksByListId(listId) {
