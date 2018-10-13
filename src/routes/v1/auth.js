@@ -21,6 +21,9 @@ router.post(
   authController.reSendVerifyEmail
 );
 
+router.get("/test", (req, res) => {
+  res.send("HEELO");
+});
 
 //Routers method PUT
 router.put(
@@ -39,7 +42,7 @@ router.put(
   authController.updatePasswordByUserId
 );
 
-router.post("/me",authController.me)
+router.post("/me", authController.me);
 //Routers method DELETE
 
 router.post("/resetPassword", authController.resetPassword);
