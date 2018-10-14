@@ -11,7 +11,6 @@ const authenticate = function(req, res, next) {
     return ResponseHelper.respondWithError(res, null, "NO_TOKEN_PROVIDED");
   try {
     jwt.verify(token, config.secret, async function(err, decoded) {
-      console.log("errr", err);
       if (err && err.message === "jwt expired") {
         const refresherToken = await tokenHandler.getTokenByToken(token);
         if (!refresherToken)
@@ -19,7 +18,7 @@ const authenticate = function(req, res, next) {
         jwt.verify(
           refresherToken.refreshToken,
           config.refreshTokenSecret,
-          async (err, decoded) => {
+          async err => {
             if (err) {
               await tokenHandler.deleteToken(refresherToken.refreshToken);
               return ResponseHelper.respondWithError(

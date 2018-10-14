@@ -3,9 +3,9 @@ import Base from "./base";
 import TaskModel from "../models/Task";
 
 class TaskHandler extends Base {
-  async createNewTask(listId, projectId, title, position) {
+  async createNewTask(listId, projectId, name, position) {
     const newTask = await TaskModel.create({
-      title,
+      name,
       position,
       projectId,
       listId,
@@ -14,8 +14,8 @@ class TaskHandler extends Base {
     });
     return newTask;
   }
-  async getTaskByTitle(taskTitle) {
-    const task = await TaskModel.findOne({ title: taskTitle });
+  async getTaskByName(taskName) {
+    const task = await TaskModel.findOne({ name: taskName });
     return task;
   }
   async getTaskById(taskId) {
@@ -65,6 +65,11 @@ class TaskHandler extends Base {
   async getTasksByListId(listId) {
     const tasks = await TaskModel.find({ listId });
     return tasks;
+  }
+
+  async getTasksByProjectId(projectId){
+    const tasks = await TaskModel.find({projectId:projectId})
+    return tasks
   }
 }
 export default TaskHandler;

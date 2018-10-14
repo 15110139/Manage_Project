@@ -7,16 +7,16 @@ const TaskSchema = new mongoose.Schema(
     _id: { type: String, default: uuid.v4 },
     listId: { type: String, ref: "List" },
     projectId: { type: String, ref: "Project" },
-    title: {
+    name: {
       type: String
     },
     position: {
       type: Number
     },
-    describe: {
+    description: {
       type: String
     },
-    lable: [String],
+    label: [String],
     members: [{ type: String, ref: "User" }],
     timeExpired: {
       type: Date

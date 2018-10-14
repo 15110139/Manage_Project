@@ -5,6 +5,6 @@ const router = require("express").Router();
 
 let searchController = new SearchController();
 
-router.get("/searchUser", searchController.searchUser);
+router.get("/searchUser", authentication, searchController.searchUser);
 
 export default router;

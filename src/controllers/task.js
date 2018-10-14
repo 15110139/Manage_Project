@@ -18,12 +18,12 @@ const listHandler = new ListHandler();
 
 class TaskController extends BaseController {
   async createNewTask(req, res) {
-    const { listId, title, projectId } = req.body;
+    const { listId, name, projectId } = req.body;
     const { userId } = req;
     let errors = await this.getErrorsParameters(req, TASK_SHEME);
     if (errors.length > 0) this.response(res).onError("INVALID_ARGUMENT");
     try {
-      const task = await taskHandlers.getTaskByTitle(title);
+      const task = await taskHandlers.getTaskByName(name);
       if (task) throw new ValidationError("DUPLICATE_NAME");
       const project = await projectHandler.getProjectById(projectId);
       if (!project) throw new ValidationError("PROJECT_IS_NOT_EXIST");
@@ -33,7 +33,7 @@ class TaskController extends BaseController {
       const newTask = await taskHandlers.createNewTask(
         listId,
         projectId,
-        title,
+        name,
         listTask.length + 1
       );
       await activeHandler.createNewActive(

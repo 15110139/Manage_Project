@@ -11,6 +11,13 @@ class SearchHandler extends Base {
         { lastName: { $regex: textSearch, $options: "i" } },
         { fullName: { $regex: textSearch, $options: "i" } } // find by phone number
       ]
+    }).select({
+      _id: 1,
+      email: 1,
+      username: 1,
+      avatarUrl: 1,
+      lastName: 1,
+      firstName: 1
     });
 
     return listUser;

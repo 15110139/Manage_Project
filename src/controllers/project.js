@@ -153,11 +153,11 @@ class ProjectController extends BaseController {
         if (membersInProject.indexOf(userId) == -1)
           throw new ValidationError("USER_IS_NOT_IN_PROJECT");
       }
-      const data = await projectHandler.getListAndTaskByProjectId(projectId);
-      const newProject = Object.assign(project.toObject(), {
-        lists: data
-      });
-      this.response(res).onSuccess(newProject);
+      const tasks = await taskHandler.getTasksByProjectId(projectId);
+
+      const lists = await listHandler.getListsByProjectId(projectId);
+
+      this.response(res).onSuccess({ project, tasks, lists });
     } catch (errors) {
       this.response(res).onError(null, errors);
     }
