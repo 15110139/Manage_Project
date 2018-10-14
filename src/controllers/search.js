@@ -6,7 +6,7 @@ const searchHandler = new SearchHandler();
 
 class SearchController extends BaseController {
   async searchUser(req, res) {
-    const { textSearch } = req.body;
+    const { textSearch } = req.query;
     if (!textSearch) this.response(req).onError("INVALID_ARGUMENT");
     try {
       const listUser = await searchHandler.searchUser(textSearch);

@@ -4,7 +4,7 @@ export const PROJECT_SHEME = {
       errorMessage: "PROJECT_NAME_IS_EMPTY"
     },
     isLength: {
-      options: [{ min: 2, max: 50 }],
+      options: [{ min: 2, max: 30 }],
       errorMessage: "INVAILD_PROJECT_NAME"
     }
   }

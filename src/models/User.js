@@ -11,7 +11,7 @@ const UserSchema = new mongoose.Schema(
       required: true,
       unique: true
     },
-    username :{
+    username: {
       type: String,
       required: true,
       unique: true
@@ -32,8 +32,11 @@ const UserSchema = new mongoose.Schema(
       type: String,
       default: ""
     },
-    fullName:{
-      type:String
+    fullName: {
+      type: String
+    },
+    lastAccess: {
+      type: Date
     }
   },
   { timestamps: true }

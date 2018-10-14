@@ -170,7 +170,7 @@ class TaskController extends BaseController {
   }
 
   async getTasksByListId(req, res) {
-    const { listId } = req.body;
+    const { listId } = req.params;
     const { userId } = req;
     if (!listId) this.response(res).onError("INVALID_ARGUMENT");
     try {
@@ -183,7 +183,7 @@ class TaskController extends BaseController {
         if (membersInProject.indexOf(userId) == -1)
           throw new ValidationError("USER_IS_NOT_IN_PROJECT");
       }
-      const tasks = await taskHandlers.getTasksByListId();
+      const tasks = await taskHandlers.getTasksByListId(listId);
       this.response(res).onSuccess(tasks);
     } catch (errors) {
       this.response(res).onError(null, errors);

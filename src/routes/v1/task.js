@@ -8,24 +8,22 @@ import TaskController from "../../controllers/task";
 let taskController = new TaskController();
 
 //Routers method GET
-router.post(
-  "/createNewTask",
-  authentication,
-  taskController.createNewTask
-);
+router.post("/createNewTask", authentication, taskController.createNewTask);
+
+router.put("/addMemberToTask", authentication, taskController.addMemberToTask);
 
 router.put(
-  "/addMemberToTask",
+  "/removeMembersToTask",
   authentication,
-  taskController.addMemberToTask
+  taskController.removeMembersToTask
 );
 
-router.put("/removeMembersToTask",authentication,taskController.removeMembersToTask)
+router.put("/moveTask", authentication, taskController.moveTask);
 
-router.put("/moveTask",authentication,taskController.moveTask)
-
-router.post("/getTasksByListId",authentication,taskController.getTasksByListId)
-
-
+router.get(
+  "/getTasksByListId/:listId",
+  authentication,
+  taskController.getTasksByListId
+);
 
 export default router;

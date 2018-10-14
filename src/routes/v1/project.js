@@ -29,13 +29,13 @@ router.get(
   projectController.getListProjectByUser
 );
 
-router.post(
-  "/getListAndTaskByProjectId",
+router.get(
+  "/getListAndTaskByProjectId/:projectId",
   authentication,
   projectController.getListAndTaskByProjectId
 );
-router.post(
-  "/getProjectAndListAndTaskByTaskId",
+router.get(
+  "/getProjectAndListAndTaskByTaskId/:taskId",
   authentication,
   projectController.getProjectAndListAndTaskByTaskId
 );

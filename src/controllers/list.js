@@ -89,7 +89,7 @@ class ListController extends BaseController {
   }
 
   async getListsByProjectId(req, res) {
-    const { projectId } = req.body;
+    const { projectId } = req.params;
     const { userId } = req;
     if (!projectId) this.response(res).onError("INVALID_ARGUMENT");
     try {
