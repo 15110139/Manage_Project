@@ -19,7 +19,7 @@ const TaskSchema = new mongoose.Schema(
     label: [String],
     members: [{ type: String, ref: "User" }],
     timeExpired: {
-      type: Date
+      type: Number
     }
   },
   { timestamps: true }
