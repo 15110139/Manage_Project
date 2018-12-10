@@ -1,13 +1,9 @@
 import BaseController from "./base";
 import AuthHandler from "../handlers/auth";
-import EmailHandler from "../handlers/email";
 import TokenHandler from "../handlers/token";
 
 const tokenHanhler = new TokenHandler();
 let authHandler = new AuthHandler();
-let emailHandler = new EmailHandler();
-import emailConfig from "../../config/email";
-import contentEmail from "../../config/contentVerifyEmail";
 const config = require("../middlewares/config");
 
 import moment from "moment";
