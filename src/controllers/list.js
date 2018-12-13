@@ -27,8 +27,8 @@ class ListController extends BaseController {
         if (membersInProject.indexOf(userId) == -1)
           throw new ValidationError("USER_IS_NOT_IN_PROJECT");
       }
-      const list = await listHandlers.getListByName(name);
-      if (list) throw new ValidationError("DUPLICATE_NAME");
+      // const list = await listHandlers.getListByName(name);
+      // if (list) throw new ValidationError("DUPLICATE_NAME");
       const newList = await listHandlers.createNewList(projectId, name);
       await activetHandler.createNewActive(
         "CREATE_NEW_LIST",
