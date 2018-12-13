@@ -3,10 +3,10 @@ export const LIST_SHEME = {
     notEmpty: {
       errorMessage: "PROJECT_NAME_IS_EMPTY"
     },
-    isLength: {
-      options: [{ min: 2, max: 50 }],
-      errorMessage: "INVAILD_LIST_NAME"
-    }
+    // isLength: {
+    //   options: [{ min: 2, max: 50 }],
+    //   errorMessage: "INVAILD_LIST_NAME"
+    // }
   },
   projectId: {
     notEmpty: {
@@ -20,10 +20,10 @@ export const UPDATE_LIST_SHEME = {
     notEmpty: {
       errorMessage: "PROJECT_NAME_IS_EMPTY"
     },
-    isLength: {
-      options: [{ min: 2, max: 50 }],
-      errorMessage: "INVAILD_LIST_NAME"
-    }
+    // isLength: {
+    //   options: [{ min: 2, max: 50 }],
+    //   errorMessage: "INVAILD_LIST_NAME"
+    // }
   },
   listId: {
     notEmpty: {

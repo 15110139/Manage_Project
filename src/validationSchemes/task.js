@@ -2,10 +2,10 @@ export const TASK_SHEME = {
   name: {
     notEmpty: true,
     errorMessage: "TASK_NAME_IS_EMPTY",
-    isLength: {
-      options: [{ min: 2, max: 50 }],
-      errorMessage: "INVAILD_TASK_NAME"
-    }
+    // isLength: {
+    //   options: [{ min: 2, max: 50 }],
+    //   errorMessage: "INVAILD_TASK_NAME"
+    // }
   },
   listId: {
     notEmpty: {

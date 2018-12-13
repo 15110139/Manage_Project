@@ -3,10 +3,10 @@ export const PROJECT_SHEME = {
     notEmpty: {
       errorMessage: "PROJECT_NAME_IS_EMPTY"
     },
-    isLength: {
-      options: [{ min: 2, max: 30 }],
-      errorMessage: "INVAILD_PROJECT_NAME"
-    }
+    // isLength: {
+    //   options: [{ min: 2, max: 30 }],
+    //   errorMessage: "INVAILD_PROJECT_NAME"
+    // }
   }
 };
 

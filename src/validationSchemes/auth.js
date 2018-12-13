@@ -5,10 +5,10 @@ export const LOGIN_VALIDATION_SCHEMA = {
   },
   password: {
     notEmpty: true,
-    isLength: {
-      options: [{ min: 6, max: 35 }],
-      errorMessage: "INVAILD_PASSWORD_PROVIDED"
-    },
+    // isLength: {
+    //   options: [{ min: 6, max: 35 }],
+    //   errorMessage: "INVAILD_PASSWORD_PROVIDED"
+    // },
     errorMessage: "PASSWORD_IS_NOT_EMPTY"
   }
 };
@@ -32,18 +32,18 @@ export const REGISTER_VALIDATION_SCHEMA = {
   },
   username: {
     notEmpty: true,
-    isLength: {
-      options: [{ min: 6, max: 35 }],
-      errorMessage: "INVAILD_USERNAME_PROVIDED"
-    },
+    // isLength: {
+    //   options: [{ min: 6, max: 35 }],
+    //   errorMessage: "INVAILD_USERNAME_PROVIDED"
+    // },
     errorMessage: "USERNAME_NOT_EMPTY"
   },
   password: {
     notEmpty: true,
-    isLength: {
-      options: [{ min: 6, max: 35 }],
-      errorMessage: "INVAILD_PASSWORD_PROVIDED"
-    },
+    // isLength: {
+    //   options: [{ min: 6, max: 35 }],
+    //   errorMessage: "INVAILD_PASSWORD_PROVIDED"
+    // },
     errorMessage: "PASSWORD_NOT_EMPTY"
   },
   firstName: {
@@ -65,18 +65,18 @@ export const UPDATE_AVATAR_VALIDATE_SCHEMA = {
 export const CHANGE_PASSWORD_SCHEMA = {
   oldPassword: {
     notEmpty: true,
-    isLength: {
-      options: [{ min: 6, max: 35 }],
-      errorMessage: "INVAILD_OLD_PASSWORD_PROVIDED"
-    },
+    // isLength: {
+    //   options: [{ min: 6, max: 35 }],
+    //   errorMessage: "INVAILD_OLD_PASSWORD_PROVIDED"
+    // },
     errorMessage: "OLD_PASSWORD_NOT_EMPTY"
   },
   newPassword: {
     notEmpty: true,
-    isLength: {
-      options: [{ min: 6, max: 35 }],
-      errorMessage: "INVAILD_NEW_PASSWORD_PROVIDED"
-    },
+    // isLength: {
+    //   options: [{ min: 6, max: 35 }],
+    //   errorMessage: "INVAILD_NEW_PASSWORD_PROVIDED"
+    // },
     errorMessage: "NEW_PASSWORD_NOT_EMPTY"
   }
 };
