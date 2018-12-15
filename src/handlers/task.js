@@ -50,19 +50,55 @@ class TaskHandler extends Base {
   }
 
   async updatePositionAsList(listId, taskId, position) {
-    await TaskModel.updateMany(
+    await TaskModel.updateOne(
       {
-        position: { $gte: position },
-        _id: !taskId,
+        _id: taskId,
         listId: listId
       },
       {
-        $inc: { position: value ? 1 : -1 }
+        position
       }
     );
   }
 
+  async updatePositionListAsList(listId, taskId, oldposition, newposition, val) {
+    await TaskModel.updateMany({
+      _id: { $ne: taskId },
+      listId: listId,
+      position: { $lte: newposition, $gt: oldposition }
+    }, {
+        $inc: { position: val }
+      })
+  }
 
+  async updatePositionNonAsList(listId, taskId, position) {
+    await TaskModel.updateOne(
+      {
+        _id: taskId,
+      },
+      {
+        position,
+        listId: listId
+      }
+    );
+  }
+  async updatePositionListNew(listId, taskId, newposition) {
+    await TaskModel.updateMany({
+      _id: { $ne: taskId },
+      listId: listId,
+      position: { $gte: newposition }
+    }, {
+        $inc: { position: 1 }
+      })
+  }
+  async updatePositionListOld(listId, oldposition) {
+    await TaskModel.updateMany({
+      listId: listId,
+      position: { $gte: oldposition }
+    }, {
+        $inc: { position: -1 }
+      })
+  }
   async getTasksByListId(listId) {
     const tasks = await TaskModel.find({ listId });
     return tasks;
@@ -75,12 +111,12 @@ class TaskHandler extends Base {
   async removeTask(taskId) {
     await TaskModel.remove({ _id: taskId })
   }
-  async removeTaskByListId(listId){
-    await TaskModel.remove({listId:listId})
+  async removeTaskByListId(listId) {
+    await TaskModel.remove({ listId: listId })
   }
 
-  async removeTaskByProjectId(projectId){
-    await TaskModel.remove({projectId:projectId})
+  async removeTaskByProjectId(projectId) {
+    await TaskModel.remove({ projectId: projectId })
   }
 }
 export default TaskHandler;

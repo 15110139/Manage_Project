@@ -34,7 +34,7 @@ class TaskController extends BaseController {
         listId,
         projectId,
         name,
-        listTask.length + 1
+        listTask.length
       );
       await activeHandler.createNewActive(
         "ADD_TASK_TO_LIST",
@@ -146,29 +146,35 @@ class TaskController extends BaseController {
       // if (!list) throw new ValidationError("LIST_IS_NOT_EXIST");
       // if (task.projecId !== list.projectId)
       //   throw new ValidationError("TASK_IS_NOT_IN_PROJECT");
-
-      if (!task.listId === listId) {
-        await taskHandlers.moveTask(taskId, listId, position);
-        await taskHandlers.updatePosition(listId, taskId, position, true);
-        await taskHandlers.updatePosition(task.listId, taskId, position, false);
-
-        await activeHandler.createNewActive(
-          "MOVE_TASK",
-          project._id,
-          taskId,
-          req.userId,
-          task.listId,
-          null,
-          listId
-        );
+      console.log(listId, task.listId)
+      if (task.listId !== listId) {
+        console.log(listId)
+        console.log('khac list')
+        await taskHandlers.updatePositionNonAsList(listId, taskId, position)
+        await taskHandlers.updatePositionListNew(listId, taskId, position)
+        await taskHandlers.updatePositionListOld(task.listId, task.position)
+        // await activeHandler.createNewActive(
+        //   "MOVE_TASK",
+        //   project._id,
+        //   taskId,
+        //   req.userId,
+        //   task.listId,
+        //   null,
+        //   listId
+        // );
       } else {
-        console.log('cung list')
+        console.log('cung list', task.position, position)
         if (task.position < position) {
-            await taskHandlers.updatePosition()
+          console.log("position cu", task.position)
+          console.log("position moi", position)
+          await taskHandlers.updatePositionAsList(listId, taskId, position)
+          await taskHandlers.updatePositionListAsList(listId, taskId, task.position, position, -1)
+        } else {
+          await taskHandlers.updatePositionAsList(listId, taskId, position)
+          await taskHandlers.updatePositionListAsList(listId, taskId, position, task.position, 1)
         }
-        await taskHandlers.updatePosition(listId, taskId, position);
       }
-      this.response(res).onSuccess(newTask);
+      this.response(res).onSuccess();
     } catch (errors) {
       this.response(res).onError(null, errors);
     }
