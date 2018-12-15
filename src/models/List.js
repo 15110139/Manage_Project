@@ -8,8 +8,7 @@ const ListSchema = new mongoose.Schema(
     projectId: { type: String, ref: "Project" },
     name: {
       type: String,
-      required: true,
-      unique: true
+      required: true
     }
   },
   { timestamps: true }
