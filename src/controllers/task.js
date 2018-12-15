@@ -142,12 +142,13 @@ class TaskController extends BaseController {
     try {
       const task = await taskHandlers.getTaskById(taskId);
       const list = await listHandler.getListById(listId);
-      if (!task) throw new ValidationError("TASK_IS_NOT_EXIST");
-      if (!list) throw new ValidationError("LIST_IS_NOT_EXIST");
-      if (task.projecId !== list.projectId)
-        throw new ValidationError("TASK_IS_NOT_IN_PROJECT");
-      await taskHandlers.moveTask(taskId, listId, position);
+      // if (!task) throw new ValidationError("TASK_IS_NOT_EXIST");
+      // if (!list) throw new ValidationError("LIST_IS_NOT_EXIST");
+      // if (task.projecId !== list.projectId)
+      //   throw new ValidationError("TASK_IS_NOT_IN_PROJECT");
+
       if (!task.listId === listId) {
+        await taskHandlers.moveTask(taskId, listId, position);
         await taskHandlers.updatePosition(listId, taskId, position, true);
         await taskHandlers.updatePosition(task.listId, taskId, position, false);
 
@@ -161,6 +162,10 @@ class TaskController extends BaseController {
           listId
         );
       } else {
+        console.log('cung list')
+        if (task.position === 1) {
+
+        }
         await taskHandlers.updatePosition(listId, taskId, position, true);
       }
       this.response(res).onSuccess(newTask);
@@ -168,6 +173,7 @@ class TaskController extends BaseController {
       this.response(res).onError(null, errors);
     }
   }
+
 
   async getTasksByListId(req, res) {
     const { listId } = req.params;
@@ -187,6 +193,19 @@ class TaskController extends BaseController {
       this.response(res).onSuccess(tasks);
     } catch (errors) {
       this.response(res).onError(null, errors);
+    }
+  }
+
+  async removeTask(req, res) {
+    const { taskId } = req.params
+    if (!taskId) this.response(res).onError("INVALID_ARGUMENT");
+    try {
+      const task = await taskHandlers.getTaskById(taskId)
+      if (!task) throw new ValidationError("TASK_IS_NOT_EXIST");
+      await taskHandlers.removeTask(taskId)
+      this.response(res).onSuccess()
+    } catch (error) {
+      this.response(res).onError(null, error)
     }
   }
 }

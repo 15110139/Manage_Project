@@ -62,14 +62,25 @@ class TaskHandler extends Base {
     );
   }
 
+
   async getTasksByListId(listId) {
     const tasks = await TaskModel.find({ listId });
     return tasks;
   }
 
-  async getTasksByProjectId(projectId){
-    const tasks = await TaskModel.find({projectId:projectId})
+  async getTasksByProjectId(projectId) {
+    const tasks = await TaskModel.find({ projectId: projectId })
     return tasks
+  }
+  async removeTask(taskId) {
+    await TaskModel.remove({ _id: taskId })
+  }
+  async removeTaskByListId(listId){
+    await TaskModel.remove({listId:listId})
+  }
+
+  async removeTaskByProjectId(projectId){
+    await TaskModel.remove({projectId:projectId})
   }
 }
 export default TaskHandler;

@@ -4,7 +4,7 @@
     "main": "index.js",
     "license": "MIT",
     "scripts": {
-        "start": "nodemon",
+        "start": "nodemon index.js",
         "prod:start": "pm2 start index.js --name \"server\""
     },
     "devDependencies": {},

@@ -26,4 +26,6 @@ router.get(
   taskController.getTasksByListId
 );
 
+router.delete("/removeTask/:taskId",authentication,taskController.removeTask)
+
 export default router;

@@ -62,5 +62,8 @@ class ProjectHandler extends Base {
     ]);
     return data;
   }
+  async removeProject(projectId){
+    await ProjectModel.remove({_id:projectId})
+  }
 }
 export default ProjectHandler;

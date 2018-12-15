@@ -40,4 +40,6 @@ router.get(
   projectController.getProjectAndListAndTaskByTaskId
 );
 
+router.delete('/removeProject/:projectId',authentication,projectController.removeProject)
+
 export default router;

@@ -45,26 +45,27 @@ class ListController extends BaseController {
     }
   }
 
-  async removeList(req, res) {
-    const { listId } = req.body;
-    if (!listId) this.response(res).onError("INVALID_ARGUMENT");
-    try {
-      if (!listId) throw new ValidationError("LIST_ID_IS_NOT_EMPTY");
-      const list = await listHandler.getListById(listId);
-      if (!list) throw new ValidationError("LIST_IS_NOT_EXIST");
-      const project = await projectHandler.getProjectById(list.projectId);
-      if (!project) throw new ValidationError("PROJECT_IS_NOT_EXIST");
-      if (project.userId !== userId) {
-        const membersInProject = project.members;
-        if (membersInProject.indexOf(userId) == -1)
-          throw new ValidationError("USER_IS_NOT_IN_PROJECT");
-      }
-      await listHandlers.removeList(listId);
-      this.response(res).onSuccess();
-    } catch (errors) {
-      this.response(res).onError(null, errors);
-    }
-  }
+  // async removeList(req, res) {
+  //   const { listId } = req.body;
+  //   if (!listId) this.response(res).onError("INVALID_ARGUMENT");
+  //   try {
+  //     if (!listId) throw new ValidationError("LIST_ID_IS_NOT_EMPTY");
+  //     const list = await listHandler.getListById(listId);
+  //     if (!list) throw new ValidationError("LIST_IS_NOT_EXIST");
+  //     const project = await projectHandler.getProjectById(list.projectId);
+  //     if (!project) throw new ValidationError("PROJECT_IS_NOT_EXIST");
+  //     if (project.userId !== userId) {
+  //       const membersInProject = project.members;
+  //       if (membersInProject.indexOf(userId) == -1)
+  //         throw new ValidationError("USER_IS_NOT_IN_PROJECT");
+  //     }
+  //     await listHandlers.removeList(listId)
+  //     await taskHandler.removeTaskByListId(listId)
+  //     this.response(res).onSuccess();
+  //   } catch (errors) {
+  //     this.response(res).onError(null, errors);
+  //   }
+  // }
 
   async updateList(req, res) {
     const { listId, name } = req.body;
@@ -105,6 +106,21 @@ class ListController extends BaseController {
     } catch (errors) {
       this.response(res).onError(null, errors);
     }
+  }
+
+  async removeList(req, res) {
+    const { listId } = req.params
+    if (!listId) this.response(res).onError("INVALID_ARGUMENT");
+    try {
+      const list = await listHandlers.getListById(listId)
+      if (!list) throw new ValidationError("LIST_IS_NOT_EXIST");
+      await listHandlers.removeList(listId)
+      await taskHandler.removeTaskByListId(listId)
+      this.response(res).onSuccess();
+    } catch (error) {
+      this.response(res).onError(null, error);
+    }
+
   }
 }
 

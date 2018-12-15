@@ -10,7 +10,7 @@ let listController = new ListController();
 //Routers method GET
 router.post("/createNewList", authentication, listController.createNewList);
 router.put("/updateList", authentication, listController.updateList);
-router.delete("/removeList", authentication, listController.removeList);
+router.delete("/removeList/:listId", authentication, listController.removeList);
 router.get(
   "/getListByProjectId/:projectId",
   authentication,

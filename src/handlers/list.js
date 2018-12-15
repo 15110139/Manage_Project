@@ -10,11 +10,12 @@ class ListHandlers extends Base {
     });
     return newList;
   }
-  async removeTask(listId) {
+  async removeList(listId) {
     await ListModel.remove({ _id: listId });
   }
   async getListById(listId) {
     const list = await ListModel.findOne({ _id: listId });
+    console.log(listId)
     return list;
   }
   async updateList(listId, name) {
@@ -30,6 +31,9 @@ class ListHandlers extends Base {
   async getListsByProjectId(projectId) {
     const lists = await ListModel.find({ projectId });
     return lists;
+  }
+  async removeListByProjectId(projectId) {
+    await ListModel.remove({ projectId: projectId })
   }
   //
 }

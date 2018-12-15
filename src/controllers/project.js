@@ -37,7 +37,7 @@ class ProjectController extends BaseController {
     }
   }
   async addMembersToProject(req, res) {
-    const { userId, projectId } = req.body;
+    const { listMembers, projectId } = req.body;
     const errors = await this.getErrorsParameters(req, ADD_MEMBERS_TO_PROJECT);
     if (errors.length > 0) this.response(res).onError("INVALID_ARGUMENT");
     try {
@@ -46,9 +46,6 @@ class ProjectController extends BaseController {
       const project = await projectHandler.getProjectById(projectId);
       if (!project) throw new ValidationError("PROJECT_NOT_FOUND");
       const listMembersInProject = project.members;
-      if (project.userId === userId)
-        throw new ValidationError("MEMBERS_IS_PEOPLE_CREATE_PROJECT");
-      const isExist = listMembersInProject.indexOf(userId);
       if (isExist !== -1) throw new ValidationError("MEMBERS_IS_IN_PORJECT");
       const result = await projectHandler.addMembersToProject(
         projectId,
@@ -185,6 +182,22 @@ class ProjectController extends BaseController {
       this.response(res).onSuccess(newData);
     } catch (errors) {
       this.response(res).onError(null, errors);
+    }
+  }
+
+  async removeProject(req, res) {
+    const { projectId } = req.params
+    const userId = req
+    try {
+      let project = await projectHandler.getProjectById(projectId);
+      if (!project) throw new ValidationError("PROJECT_IS_NOT_EXIST");
+      await projectHandler.removeProject(projectId)
+      await listHandler.removeListByProjectId(projectId)
+      await taskHandler.removeTaskByProjectId(projectId)
+      this.response(res).onSuccess();
+    } catch (errors) {
+      this.response(res).onError(null, errors);
+
     }
   }
 }
