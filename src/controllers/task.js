@@ -163,10 +163,10 @@ class TaskController extends BaseController {
         );
       } else {
         console.log('cung list')
-        if (task.position === 1) {
-
+        if (task.position < position) {
+            await taskHandlers.updatePosition()
         }
-        await taskHandlers.updatePosition(listId, taskId, position, true);
+        await taskHandlers.updatePosition(listId, taskId, position);
       }
       this.response(res).onSuccess(newTask);
     } catch (errors) {

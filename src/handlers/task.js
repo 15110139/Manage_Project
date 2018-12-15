@@ -49,7 +49,7 @@ class TaskHandler extends Base {
     return newTask;
   }
 
-  async updatePosition(listId, taskId, position, value) {
+  async updatePositionAsList(listId, taskId, position) {
     await TaskModel.updateMany(
       {
         position: { $gte: position },
