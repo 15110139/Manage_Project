@@ -27,9 +27,10 @@ class ListController extends BaseController {
         if (membersInProject.indexOf(userId) == -1)
           throw new ValidationError("USER_IS_NOT_IN_PROJECT");
       }
+      const lists = await listHandlers.getListsByProjectId(projectId)
       // const list = await listHandlers.getListByName(name);
       // if (list) throw new ValidationError("DUPLICATE_NAME");
-      const newList = await listHandlers.createNewList(projectId, name);
+      const newList = await listHandlers.createNewList(projectId, name, lists.length);
       await activetHandler.createNewActive(
         "CREATE_NEW_LIST",
         projectId,
@@ -121,6 +122,37 @@ class ListController extends BaseController {
       this.response(res).onError(null, error);
     }
 
+  }
+
+  async moveList(req, res) {
+    const { listId, position } = req.body
+    console.log(listId, position)
+    if (!listId) this.response(res).onError("INVALID_ARGUMENT");
+    if (!position) this.response(res).onError("INVALID_ARGUMENT");
+    try {
+      const list = await listHandlers.getListById(listId)
+      if (!list) throw new ValidationError("LIST_IS_NOT_EXIST");
+      const lists = await listHandlers.getListsByProjectId(list.projectId)
+      if (lists.length - 1 < position) {
+        if (!list) throw new ValidationError("POSITION_IS_NOT_EXIST");
+      }
+      await listHandlers.updatePositionList(listId, position)
+
+      if (list.position < position) {
+        console.log("position cu < position moi")
+        console.log("position cu", list.position)
+        console.log("position moi", position)
+        await listHandlers.updatePositionListInProject(list.projectId, listId, position, list.position, -1)
+      } else {
+        console.log("position cu > position moi")
+        console.log("position cu", list.position)
+        console.log("position moi", position)
+        await listHandlers.updatePositionListInProject(list.projectId, listId, list.position, position, 1)
+      }
+      this.response(res).onSuccess();
+    } catch (error) {
+      this.response(res).onError(null, error)
+    }
   }
 }
 

@@ -16,6 +16,7 @@ router.get(
   authentication,
   listController.getListsByProjectId
 );
+router.put("/moveList",authentication,listController.moveList)
 
 
 export default router;

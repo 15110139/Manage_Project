@@ -9,6 +9,9 @@ const ListSchema = new mongoose.Schema(
     name: {
       type: String,
       required: true
+    },
+    position: {
+      type: Number
     }
   },
   { timestamps: true }

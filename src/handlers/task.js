@@ -61,7 +61,7 @@ class TaskHandler extends Base {
     );
   }
 
-  async updatePositionListAsList(listId, taskId, oldposition, newposition, val) {
+  async updatePositionTaskInList(listId, taskId, oldposition, newposition, val) {
     await TaskModel.updateMany({
       _id: { $ne: taskId },
       listId: listId,

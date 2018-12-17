@@ -3,10 +3,10 @@ import Base from "./base";
 import ListModel from "../models/List";
 
 class ListHandlers extends Base {
-  async createNewList(projectId, name) {
+  async createNewList(projectId, name, position) {
     const newList = await ListModel.create({
       projectId,
-      name
+      name, position
     });
     return newList;
   }
@@ -35,6 +35,15 @@ class ListHandlers extends Base {
   async removeListByProjectId(projectId) {
     await ListModel.remove({ projectId: projectId })
   }
-  //
+  async updatePositionList(listId, position) {
+    await ListModel.updateOne({ _id: listId }, { position })
+  }
+  async updatePositionListInProject(projectId, lisId, newPosition, oldPosition, val) {
+    await ListModel.updateMany({
+      _id: { $ne: lisId },
+      projectId: projectId,
+      position: { $lte: newPosition, $gt: oldPosition }
+    }, { $inc: { position: val } })
+  }
 }
 export default ListHandlers;

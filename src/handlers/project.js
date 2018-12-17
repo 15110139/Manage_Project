@@ -9,7 +9,7 @@ class ProjectHandler extends Base {
       name,
       backgroundUrl,
       userId,
-      members: []
+      members: [`${userId}`]
     });
     return newProject;
   }
@@ -62,8 +62,8 @@ class ProjectHandler extends Base {
     ]);
     return data;
   }
-  async removeProject(projectId){
-    await ProjectModel.remove({_id:projectId})
+  async removeProject(projectId) {
+    await ProjectModel.remove({ _id: projectId })
   }
 }
 export default ProjectHandler;
