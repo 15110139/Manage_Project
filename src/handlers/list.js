@@ -29,7 +29,7 @@ class ListHandlers extends Base {
   }
 
   async getListsByProjectId(projectId) {
-    const lists = await ListModel.find({ projectId });
+    const lists = await ListModel.find({ projectId }). sort({ position: -1 });
     return lists;
   }
   async removeListByProjectId(projectId) {
