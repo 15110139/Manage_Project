@@ -1,11 +1,8 @@
 import mongoose from "mongoose";
 import bcrypt from "bcrypt";
 const SALT_WORK_FACTOR = 10;
-require("mongoose-uuid2")(mongoose);
-const uuid = require("node-uuid");
 const UserSchema = new mongoose.Schema(
   {
-    _id: { type: String, default: uuid.v4 },
     email: {
       type: String,
       required: true,

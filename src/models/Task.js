@@ -1,10 +1,7 @@
 import mongoose from "mongoose";
-require("mongoose-uuid2")(mongoose);
-const uuid = require("node-uuid");
 
 const TaskSchema = new mongoose.Schema(
   {
-    _id: { type: String, default: uuid.v4 },
     listId: { type: String, ref: "List" },
     projectId: { type: String, ref: "Project" },
     name: {
