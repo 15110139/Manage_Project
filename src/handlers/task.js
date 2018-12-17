@@ -61,7 +61,12 @@ class TaskHandler extends Base {
     );
   }
 
-  async updatePositionTaskInList(listId, taskId, oldposition, newposition, val) {
+  async updatePositionTaskInList1(listId, taskId, oldposition, newposition, val) {
+    console.log(await TaskModel.find({
+      _id: { $ne: taskId },
+      listId: listId,
+      position: { $lte: newposition, $gt: oldposition }
+    }))
     await TaskModel.updateMany({
       _id: { $ne: taskId },
       listId: listId,
@@ -70,6 +75,23 @@ class TaskHandler extends Base {
         $inc: { position: val }
       })
   }
+
+  async updatePositionTaskInList2(listId, taskId, oldposition, newposition, val) {
+    console.log(await TaskModel.find({
+      _id: { $ne: taskId },
+      listId: listId,
+      position: { $lt: oldposition, $gte: newposition }
+    }))
+    await TaskModel.updateMany({
+      _id: { $ne: taskId },
+      listId: listId,
+      position: { $lt: oldposition, $gte: newposition }
+    }, {
+        $inc: { position: val }
+      })
+  }
+
+
 
   async updatePositionNonAsList(listId, taskId, position) {
     await TaskModel.updateOne(

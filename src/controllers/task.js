@@ -169,13 +169,13 @@ class TaskController extends BaseController {
           console.log("position cu", task.position)
           console.log("position moi", position)
           await taskHandlers.updatePositionAsList(listId, taskId, position)
-          await taskHandlers.updatePositionTaskInList(listId, taskId, task.position, position, -1)
+          await taskHandlers.updatePositionTaskInList1(listId, taskId, task.position, position, -1)
         } else {
           console.log("position cu > position moi")
           console.log("position cu", task.position)
           console.log("position moi", position)
           await taskHandlers.updatePositionAsList(listId, taskId, position)
-          await taskHandlers.updatePositionTaskInList(listId, taskId, position, task.position, 1)
+          await taskHandlers.updatePositionTaskInList2(listId, taskId, task.position, position, 1)
         }
       }
       this.response(res).onSuccess();

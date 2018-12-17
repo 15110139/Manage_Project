@@ -137,13 +137,15 @@ class ListController extends BaseController {
         if (!list) throw new ValidationError("POSITION_IS_NOT_EXIST");
       }
       await listHandlers.updatePositionList(listId, position)
-
+      console.log(list.name)
       if (list.position < position) {
+        console.log("movelist")
         console.log("position cu < position moi")
         console.log("position cu", list.position)
         console.log("position moi", position)
         await listHandlers.updatePositionListInProject(list.projectId, listId, position, list.position, -1)
       } else {
+        console.log("movelist")
         console.log("position cu > position moi")
         console.log("position cu", list.position)
         console.log("position moi", position)
