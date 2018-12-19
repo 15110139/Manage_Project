@@ -126,9 +126,9 @@ class ListController extends BaseController {
 
   async moveList(req, res) {
     const { listId, position } = req.body
-    console.log(listId, position)
-    if (!listId) this.response(res).onError("INVALID_ARGUMENT");
-    if (!position) this.response(res).onError("INVALID_ARGUMENT");
+    console.log("show----------", listId, position)
+    // if (!listId) this.response(res).onError("INVALID_ARGUMENT");
+    // if (!position) this.response(res).onError("INVALID_ARGUMENT");
     try {
       const list = await listHandlers.getListById(listId)
       if (!list) throw new ValidationError("LIST_IS_NOT_EXIST");
@@ -143,13 +143,13 @@ class ListController extends BaseController {
         console.log("position cu < position moi")
         console.log("position cu", list.position)
         console.log("position moi", position)
-        await listHandlers.updatePositionListInProject(list.projectId, listId, position, list.position, -1)
+        await listHandlers.updatePositionListInProject1(list.projectId, listId, list.position, position, -1)
       } else {
         console.log("movelist")
         console.log("position cu > position moi")
         console.log("position cu", list.position)
         console.log("position moi", position)
-        await listHandlers.updatePositionListInProject(list.projectId, listId, list.position, position, 1)
+        await listHandlers.updatePositionListInProject2(list.projectId, listId, list.position, position, 1)
       }
       this.response(res).onSuccess();
     } catch (error) {

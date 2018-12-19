@@ -122,7 +122,7 @@ class TaskHandler extends Base {
       })
   }
   async getTasksByListId(listId) {
-    const tasks = await TaskModel.find({ listId }).sort({ position: -1 })
+    const tasks = await TaskModel.find({ listId }).sort({ position: 1 })
     return tasks;
   }
 

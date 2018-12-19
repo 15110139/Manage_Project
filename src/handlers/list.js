@@ -29,7 +29,7 @@ class ListHandlers extends Base {
   }
 
   async getListsByProjectId(projectId) {
-    const lists = await ListModel.find({ projectId }). sort({ position: -1 });
+    const lists = await ListModel.find({ projectId }).sort({ position: 1 });
     return lists;
   }
   async removeListByProjectId(projectId) {
@@ -38,11 +38,32 @@ class ListHandlers extends Base {
   async updatePositionList(listId, position) {
     await ListModel.updateOne({ _id: listId }, { position })
   }
-  async updatePositionListInProject(projectId, lisId, newPosition, oldPosition, val) {
+  async updatePositionListInProject2(projectId, lisId, oldPosition, newPosition, val) {
+    console.log(2)
+
+    console.log(await ListModel.find({
+      _id: { $ne: lisId },
+      projectId: projectId,
+      position: { $lt: oldPosition, $gte: newPosition }
+    }))
     await ListModel.updateMany({
       _id: { $ne: lisId },
       projectId: projectId,
-      position: { $lte: newPosition, $gt: oldPosition }
+      position: { $lt: oldPosition, $gte: newPosition }
+    }, { $inc: { position: val } })
+  }
+
+  async updatePositionListInProject1(projectId, lisId, oldPosition, newPosition, val) {
+    console.log(1)
+    console.log(await ListModel.find({
+      _id: { $ne: lisId },
+      projectId: projectId,
+      position: { $lte: newPosition, $gte: oldPosition }
+    }))
+    await ListModel.updateMany({
+      _id: { $ne: lisId },
+      projectId: projectId,
+      position: { $lte: newPosition, $gte: oldPosition }
     }, { $inc: { position: val } })
   }
 }
