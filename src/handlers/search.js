@@ -19,7 +19,7 @@ class SearchHandler extends Base {
       lastName: 1,
       firstName: 1
     });
-
+    // const listUser = await UserModel.find({ $text: { $search: textSearch } })
     return listUser;
   }
 }
