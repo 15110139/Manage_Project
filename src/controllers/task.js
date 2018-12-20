@@ -52,42 +52,42 @@ class TaskController extends BaseController {
   }
 
   async addMemberToTask(req, res) {
-    const { taskId, userId } = req.body;
+    const { taskId, arrUserId } = req.body;
     let errors = await this.getErrorsParameters(req, ADD_MEMBERS_TO_TASK_SHEME);
     if (errors.length > 0) this.response(res).onError("INVALID_ARGUMENT");
     try {
       const task = await taskHandlers.getTaskById(taskId);
       const project = await projectHandler.getProjectById(task.projectId);
-      const listMembersInProject = project.members;
-      const isExist = listMembersInProject.indexOf(userId);
-      if (isExist == -1) throw new ValidationError("MEMBERS_IS_NOT_IN_PORJECT");
-      const listMembersInTask = task.members;
-      const isExistTask = listMembersInTask.indexOf(userId);
-      if (isExistTask !== -1)
-        throw new ValidationError("MEMBERS_IS_ASSIGN_IN_TASK");
-      const newTask = await taskHandlers.addMemberToTask(taskId, userId);
-      if (req.userId === userId) {
-        await activeHandler.createNewActive(
-          "ASSIGN_ME_TO_TASK",
-          project._id,
-          taskId,
-          req.userId,
-          null,
-          null,
-          null
-        );
-      } else {
-        await activeHandler.createNewActive(
-          "ASSIGN_MEMBERS_TO_TASK",
-          project._id,
-          taskId,
-          req.userId,
-          null,
-          userId,
-          null
-        );
-      }
-      this.response(res).onSuccess(newTask);
+      // const listMembersInProject = project.members;
+      // const isExist = listMembersInProject.indexOf(userId);
+      // if (isExist == -1) throw new ValidationError("MEMBERS_IS_NOT_IN_PORJECT");
+      // const listMembersInTask = task.members;
+      // const isExistTask = listMembersInTask.indexOf(userId);
+      // if (isExistTask !== -1)
+      //   throw new ValidationError("MEMBERS_IS_ASSIGN_IN_TASK");
+      const newTask = await taskHandlers.addMemberToTask(taskId, arrUserId);
+      // if (req.userId === userId) {
+      //   await activeHandler.createNewActive(
+      //     "ASSIGN_ME_TO_TASK",
+      //     project._id,
+      //     taskId,
+      //     req.userId,
+      //     null,
+      //     null,
+      //     null
+      //   );
+      // } else {
+      //   await activeHandler.createNewActive(
+      //     "ASSIGN_MEMBERS_TO_TASK",
+      //     project._id,
+      //     taskId,
+      //     req.userId,
+      //     null,
+      //     userId,
+      //     null
+      //   );
+      // }
+      this.response(res).onSuccess();
     } catch (errors) {
       this.response(res).onError(null, errors);
     }

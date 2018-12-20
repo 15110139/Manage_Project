@@ -44,7 +44,7 @@ class ProjectHandler extends Base {
     return projects;
   }
   async getListProjectIsMembers(userId) {
-    const projects = await ProjectModel.find({ members: userId });
+    const projects = await ProjectModel.find({ members: userId, userId: { $ne: userId } });
     return projects;
   }
 

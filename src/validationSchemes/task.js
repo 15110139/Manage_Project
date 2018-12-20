@@ -20,7 +20,7 @@ export const TASK_SHEME = {
 };
 
 export const ADD_MEMBERS_TO_TASK_SHEME = {
-  userId: {
+  arrUserId: {
     notEmpty: true,
     errorMessage: "USER_ID_IS_EMPTY"
   },

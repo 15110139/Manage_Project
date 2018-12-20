@@ -23,10 +23,10 @@ class TaskHandler extends Base {
     return task;
   }
 
-  async addMemberToTask(taskId, userId) {
+  async addMemberToTask(taskId, arrUserId) {
     const result = await TaskModel.updateOne(
       { _id: taskId },
-      { $push: { members: userId } }
+      { $push: { members: { $each: arrUserId } } }
     );
     return result;
   }
