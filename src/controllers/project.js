@@ -37,30 +37,30 @@ class ProjectController extends BaseController {
     }
   }
   async addMembersToProject(req, res) {
-    const { listMembers, projectId } = req.body;
+    const { arrUserId, projectId } = req.body;
     const errors = await this.getErrorsParameters(req, ADD_MEMBERS_TO_PROJECT);
     if (errors.length > 0) this.response(res).onError("INVALID_ARGUMENT");
     try {
-      const user = await authHandler.getUserById(userId);
-      if (!user) throw new ValidationError("USER_NOT_FOUND");
+      // const user = await authHandler.getUserById(userId);
+      // if (!user) throw new ValidationError("USER_NOT_FOUND");
       const project = await projectHandler.getProjectById(projectId);
       if (!project) throw new ValidationError("PROJECT_NOT_FOUND");
-      const listMembersInProject = project.members;
-      if (isExist !== -1) throw new ValidationError("MEMBERS_IS_IN_PORJECT");
-      const result = await projectHandler.addMembersToProject(
+      // const listMembersInProject = project.members;
+      // if (isExist !== -1) throw new ValidationError("MEMBERS_IS_IN_PORJECT");
+      await projectHandler.addMembersToProject(
         projectId,
-        userId
+        arrUserId
       );
-      await activetHandler.createNewActive(
-        "ASSGIN_MEMBER_TO_PROJECT",
-        projectId,
-        null,
-        req.userId,
-        null,
-        userId,
-        null
-      );
-      this.response(res).onSuccess(result);
+      // await activetHandler.createNewActive(
+      //   "ASSGIN_MEMBER_TO_PROJECT",
+      //   projectId,
+      //   null,
+      //   req.userId,
+      //   null,
+      //   userId,
+      //   null
+      // );
+      this.response(res).onSuccess();
     } catch (errors) {
       this.response(res).onError(null, errors);
     }

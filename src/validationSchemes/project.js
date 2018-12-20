@@ -11,9 +11,9 @@ export const PROJECT_SHEME = {
 };
 
 export const ADD_MEMBERS_TO_PROJECT = {
-  userId: {
+  arrUserId: {
     notEmpty: {
-      errorMessage: "USER_ID_IS_EMPTY"
+      errorMessage: "ARRAY_USER_ID_IS_EMPTY"
     }
   },
   projectId: {

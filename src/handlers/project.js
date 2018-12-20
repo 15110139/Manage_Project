@@ -13,12 +13,11 @@ class ProjectHandler extends Base {
     });
     return newProject;
   }
-  async addMembersToProject(projectId, userID) {
-    const result = await ProjectModel.updateOne(
+  async addMembersToProject(projectId, arrUserId) {
+    await ProjectModel.updateOne(
       { _id: projectId },
-      { $push: { members: userID } }
+      { $push: { members: { $each: arrUserId } } }
     );
-    return result;
   }
   async getProjectById(projectId) {
     const project = await ProjectModel.findOne({ _id: projectId });
