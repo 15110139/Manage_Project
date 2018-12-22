@@ -1,5 +1,6 @@
 import mongoose from "mongoose";
 import bcrypt from "bcrypt";
+import mongoosePaginate from "mongoose-paginate";
 const SALT_WORK_FACTOR = 10;
 const UserSchema = new mongoose.Schema(
   {
@@ -38,7 +39,6 @@ const UserSchema = new mongoose.Schema(
   },
   { timestamps: true }
 );
-UserSchema.index({ email: 'text' })
 UserSchema.pre("save", function (cb) {
   const user = this;
   if (!user.isModified("password")) return cb();
@@ -55,6 +55,7 @@ UserSchema.pre("save", function (cb) {
   });
 });
 
+
 UserSchema.methods.comparePassword = function (candidatePassword) {
   return new Promise((res, rej) => {
     bcrypt.compare(candidatePassword, this.password, (err, isMatch) => {
@@ -63,5 +64,7 @@ UserSchema.methods.comparePassword = function (candidatePassword) {
     });
   });
 };
+UserSchema.plugin(mongoosePaginate);
+
 const UserModel = mongoose.model("User", UserSchema);
 export default UserModel;
