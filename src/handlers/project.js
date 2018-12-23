@@ -2,6 +2,7 @@ import Base from "./base";
 //Import models
 import ProjectModel from "../models/Project";
 import ListModel from "../models/List";
+import UserModel from '../models/User'
 
 class ProjectHandler extends Base {
   async createNewProject(userId, name, backgroundUrl) {
@@ -66,6 +67,41 @@ class ProjectHandler extends Base {
   }
   async updateProject(projectId, name, backgroundUrl) {
     await ProjectModel.updateOne({ _id: projectId }, { name: name, backgroundUrl: backgroundUrl })
+  }
+
+  async searchUserInProject(listMembers, textSearch, page, limit) {
+    return String(textSearch).length == 0 ? await UserModel.paginate({ _id: { $in: listMembers } }, {
+      sort: { email: 1 }, select: {
+        _id: 1,
+        email: 1,
+        username: 1,
+        avatarUrl: 1,
+        lastName: 1,
+        firstName: 1
+      }, page: page, limit: limit
+    })
+      : await UserModel.paginate({
+        $and: [{
+          _id: { $in: listMembers }
+        }, {
+          $or: [
+            { username: { $regex: textSearch, $options: "i" } }, //find by username
+            { email: { $regex: textSearch, $options: "i" } }, //find by email
+            { firstName: { $regex: textSearch, $options: "i" } }, //find by full name
+            { lastName: { $regex: textSearch, $options: "i" } },
+            { fullName: { $regex: textSearch, $options: "i" } } // find by phone number
+          ]
+        }]
+      }, {
+          sort: { email: 1 }, select: {
+            _id: 1,
+            email: 1,
+            username: 1,
+            avatarUrl: 1,
+            lastName: 1,
+            firstName: 1
+          }, page: page, limit: limit
+        });
   }
 }
 export default ProjectHandler;

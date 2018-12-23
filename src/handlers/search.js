@@ -14,13 +14,17 @@ class SearchHandler extends Base {
       }, page: page, limit: limit
     })
       : await UserModel.paginate({
-        $or: [
-          { username: { $regex: textSearch, $options: "i" } }, //find by username
-          { email: { $regex: textSearch, $options: "i" } }, //find by email
-          { firstName: { $regex: textSearch, $options: "i" } }, //find by full name
-          { lastName: { $regex: textSearch, $options: "i" } },
-          { fullName: { $regex: textSearch, $options: "i" } } // find by phone number
-        ]
+        $and: [{
+          _id: { $in: listMembers }
+        }, {
+          $or: [
+            { username: { $regex: textSearch, $options: "i" } }, //find by username
+            { email: { $regex: textSearch, $options: "i" } }, //find by email
+            { firstName: { $regex: textSearch, $options: "i" } }, //find by full name
+            { lastName: { $regex: textSearch, $options: "i" } },
+            { fullName: { $regex: textSearch, $options: "i" } } // find by phone number
+          ]
+        }]
       }, {
           sort: { email: 1 }, select: {
             _id: 1,

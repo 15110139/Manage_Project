@@ -44,4 +44,6 @@ router.delete('/removeProject/:projectId', authentication, projectController.rem
 
 router.put('/updateProject/:projectId', authentication, projectController.updateProject)
 
+router.get('/searchUserInProject', authentication, projectController.searchUserInProject)
+
 export default router;

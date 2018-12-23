@@ -227,6 +227,23 @@ class ProjectController extends BaseController {
       this.response(res).onError(null, error);
     }
   }
+
+  async searchUserInProject(req, res) {
+    const { projectId, textSearch, pageIndex, pageSize } = req.query;
+    console.log(projectId, textSearch, pageIndex, pageSize)
+    if (!projectId) this.response(res).onError("INVALID_ARGUMENT");
+    if (!pageIndex) this.response(res).onError("INVALID_ARGUMENT");
+    if (!pageSize) this.response(res).onError("INVALID_ARGUMENT");
+    try {
+      let project = await projectHandler.getProjectById(projectId);
+      if (!project) throw new ValidationError("PROJECT_IS_NOT_EXIST");
+      const listMembers = project.members
+      const listUser = await projectHandler.searchUserInProject(listMembers, textSearch, Number(pageIndex) + 1, Number(pageSize))
+      this.response(res).onSuccess(listUser);
+    } catch (error) {
+      this.response(res).onError(null, error);
+    }
+  }
 }
 
 export default ProjectController;
