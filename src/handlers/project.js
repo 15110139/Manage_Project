@@ -64,5 +64,8 @@ class ProjectHandler extends Base {
   async removeProject(projectId) {
     await ProjectModel.remove({ _id: projectId })
   }
+  async updateProject(projectId, name, backgroundUrl) {
+    await ProjectModel.updateOne({ _id: projectId }, { name: name, backgroundUrl: backgroundUrl })
+  }
 }
 export default ProjectHandler;

@@ -14,7 +14,7 @@ const ProjectSchema = new mongoose.Schema(
       default:
         "http://thuthuatphanmem.vn/uploads/2018/04/24/hinh-nen-2018-bai-bien-dep_090320037.jpg"
     },
-    userId: { type: String, ref: "Project" },
+    userId: { type: String, ref: "User" },
 
     members: [{ type: String, ref: "User" }]
   },

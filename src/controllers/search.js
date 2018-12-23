@@ -6,11 +6,10 @@ const searchHandler = new SearchHandler();
 
 class SearchController extends BaseController {
   async searchUser(req, res) {
-    const { textSearch, page, limit } = req.query;
-    if (typeof page !== 'number') this.response(res).onError("INVALID_ARGUMENT");
-    if (typeof limit !== 'number') this.response(res).onError("INVALID_ARGUMENT");
+    const { textSearch, pageIndex, pageSize } = req.query;
+    console.log(textSearch,typeof pageIndex, typeof pageSize)
     try {
-      const listUser = await searchHandler.searchUser(textSearch, Number(page), Number(limit));
+      const listUser = await searchHandler.searchUser(textSearch, Number(pageIndex+1), Number(pageSize));
       this.response(res).onSuccess(listUser);
     } catch (error) {
       this.response(res).onError(null, error);

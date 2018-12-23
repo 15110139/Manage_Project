@@ -45,11 +45,16 @@ class ProjectController extends BaseController {
       // if (!user) throw new ValidationError("USER_NOT_FOUND");
       const project = await projectHandler.getProjectById(projectId);
       if (!project) throw new ValidationError("PROJECT_NOT_FOUND");
+      const listMember = project.members
+      let listAddMember = arrUserId.filter((members) => {
+        return !listMember.includes(members)
+      })
+
       // const listMembersInProject = project.members;
       // if (isExist !== -1) throw new ValidationError("MEMBERS_IS_IN_PORJECT");
       await projectHandler.addMembersToProject(
         projectId,
-        arrUserId
+        listAddMember
       );
       // await activetHandler.createNewActive(
       //   "ASSGIN_MEMBER_TO_PROJECT",
@@ -198,6 +203,28 @@ class ProjectController extends BaseController {
     } catch (errors) {
       this.response(res).onError(null, errors);
 
+    }
+  }
+
+
+  async updateProject(req, res) {
+    const { projectId } = req.params
+    const { name, backgroundUrl } = req.body
+    const { userId } = req
+    if (!projectId) this.response(res).onError("INVALID_ARGUMENT");
+    if (!name) this.response(res).onError("INVALID_ARGUMENT");
+    if (!backgroundUrl) this.response(res).onError("INVALID_ARGUMENT");
+
+    try {
+      let project = await projectHandler.getProjectById(projectId);
+      if (!project) throw new ValidationError("PROJECT_IS_NOT_EXIST");
+      if (project.userId !== userId) {
+        throw new ValidationError("USER_NOT_PERMISSION");
+      }
+      await projectHandler.updateProject(projectId, name, backgroundUrl)
+      this.response(res).onSuccess();
+    } catch (error) {
+      this.response(res).onError(null, error);
     }
   }
 }
