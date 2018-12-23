@@ -12,7 +12,7 @@ class SearchHandler extends Base {
         lastName: 1,
         firstName: 1
       }, page: page, limit: limit
-    }).select()
+    })
       : await UserModel.paginate({
         $or: [
           { username: { $regex: textSearch, $options: "i" } }, //find by username
